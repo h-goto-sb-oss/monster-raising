@@ -1,0 +1,356 @@
+/* index.css
+ * ゲーム全体の下敷き。ここに置くのは3つだけ:
+ *   1. デザイントークン (書体・文字の大きさ・枠の色)
+ *   2. 全画面で使い回すJRPG風のウィンドウ枠とボタン (.jrpg-win / .jrpg-btn)
+ *   3. どこにでも出るどうぐの絵 (.mrg-itemicon)
+ *
+ * 画面ごとのCSS(battleUI / fieldUI / townUI / menuUI)は、ここのトークンを
+ * 参照するだけにしてある。文字を一段大きくしたいときは --fs-* を触れば
+ * 全画面が同じだけ動く。
+ */
+
+/* =======================================================================
+ * 1. デザイントークン
+ * ======================================================================= */
+
+:root {
+  /* --- 書体 ------------------------------------------------------------
+   * ドット絵の上に乗せる文字なので、日本語の家庭用RPGの見え方に寄せて
+   * 2本立てにしてある。
+   *   --font-display … DotGothic16。日本語のビットマップ体。ドット絵と
+   *                    同じ格子に乗るので、見出し・ウィンドウの題・チップに使う。
+   *                    16px を切ると急に読みにくくなるので、本文には使わない。
+   *   --font-ui      … Zen Kaku Gothic New。ふところが広く、かなが小さくても
+   *                    つぶれない。メッセージ・メニュー・ボタン・数値はこちら。
+   * どちらも Google Fonts (index.html)。読めなかったときは
+   * Windows(Yu Gothic/Meiryo) / Mac(ヒラギノ) / Android(Noto) に落ちる。 */
+  --font-ui: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Noto Sans JP",
+    "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  --font-display: "DotGothic16", "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN",
+    "Yu Gothic", "Meiryo", sans-serif;
+
+  /* --- 文字の大きさ ----------------------------------------------------
+   * 単位は vh。戦闘・フィールド・町のルート要素はビューポート丸ごと
+   * (position:fixed; inset:0) なので、vh がそのまま画面の高さとして効く。
+   * 下限はスマホ横(高さ390px)で読める大きさ、上限は1280x720で大きすぎない大きさ。
+   *   390px高: xs=11 sm=13 md=15 lg=18 xl=22
+   *   720px高: xs=15 sm=17 md=20 lg=26 xl=34 */
+  --fs-xs: clamp(11px, 2.3vh, 15px);
+  --fs-sm: clamp(13px, 2.9vh, 17px);
+  --fs-md: clamp(15px, 3.4vh, 20px);
+  --fs-lg: clamp(18px, 4.4vh, 26px);
+  --fs-xl: clamp(22px, 5.6vh, 34px);
+
+  /* --- 色 --------------------------------------------------------------
+   * 「濃紺の窓 + 金の枠 + 黒のキーライン」。描き込まれた背景画の上に
+   * 乗せても沈まないよう、枠の外側に必ず黒を1本置く。 */
+  --ink: #f4f0e2;         /* 本文 */
+  --ink-dim: #b0b9d2;     /* 添え字 */
+  --ink-gold: #ffd97a;    /* 見出し・強調 */
+  --ink-warn: #ff9d5c;
+  --ink-good: #8fe0a0;
+  --gold: #d9bd76;        /* 枠の金 */
+  --gold-dim: rgba(217, 189, 118, 0.55);
+  --keyline: #06070d;     /* 枠の外側の黒 */
+  --win-fill-a: rgba(28, 36, 72, 0.94);
+  --win-fill-b: rgba(9, 12, 26, 0.96);
+  --win-radius: 5px;
+
+  /* 押せるものの下地。ボタンとメニュー行で共有する。 */
+  --btn-a: #3d4870;
+  --btn-b: #28304e;
+  --btn-c: #1a2036;
+  --btn-edge: #8b97bd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #0a0c16;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-weight: 500;
+  /* ドット絵の上に乗る細い字がにじまないように */
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overflow-y: auto;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* =======================================================================
+ * 2. JRPG風のウィンドウ枠とボタン
+ *
+ * 枠は「黒のキーライン → 金の縁 → 内側の淡いハイライト → 濃紺の地」の
+ * 4層。box-shadow を重ねるだけで作ってあるので画像素材が要らず、
+ * どんな大きさの箱にも同じ見た目でかかる。
+ * ======================================================================= */
+
+/* NOTE: position は **書かない**。
+   index.css は画面ごとのCSSより後ろに読み込まれるので、ここで position を
+   指定すると、同じ要素に付いている .mrg-cmd / .fld-msg / .mnu などの
+   position:absolute を上書きしてしまう(詳細度が同じ)。
+   枠は見た目だけを受け持ち、置き場所は画面ごとのCSSに任せる。 */
+.jrpg-win {
+  background: linear-gradient(180deg, var(--win-fill-a), var(--win-fill-b));
+  border: 2px solid var(--gold);
+  border-radius: var(--win-radius);
+  box-shadow:
+    0 0 0 2px var(--keyline),                    /* 外側の黒。背景画に負けないため */
+    inset 0 0 0 1px rgba(255, 236, 180, 0.26),   /* 内側のハイライト = 面取り */
+    inset 0 3px 12px rgba(0, 0, 0, 0.5),         /* 地の落ち */
+    0 4px 18px rgba(0, 0, 0, 0.55);              /* 影 */
+}
+
+/* 半透明の窓。キャンバス(モンスターや背景画)の上に重ねる窓はこちらを使う。
+   下の絵が透けるので、モンスターが窓に完全に隠れることがない。 */
+.jrpg-win--sheer {
+  background: linear-gradient(180deg, rgba(26, 33, 66, 0.8), rgba(8, 11, 24, 0.88));
+}
+
+/* 窓の題(「たたかう？」「とくぎ」など)。 */
+.jrpg-wintitle {
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  color: var(--ink-gold);
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: clamp(3px, 0.9vh, 7px);
+}
+
+/* 題の右に添える小さい字(MP残量・ふくろの空きなど)。 */
+.jrpg-winsub {
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ink-dim);
+  letter-spacing: 0;
+}
+
+/* ボタン。面取りは box-shadow の inset 2本(上に光、下に影)で作る。 */
+.jrpg-btn {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  line-height: 1.25;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--btn-a) 0%, var(--btn-b) 52%, var(--btn-c) 100%);
+  border: 1px solid var(--btn-edge);
+  border-radius: 3px;
+  padding: clamp(4px, 1.1vh, 9px) clamp(7px, 1.1vw, 13px);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jrpg-btn:hover:not(:disabled),
+.jrpg-btn:focus-visible {
+  border-color: var(--ink-gold);
+  background: linear-gradient(180deg, #4c5a8a 0%, #333d63 52%, #232a45 100%);
+  outline: none;
+}
+
+.jrpg-btn:active:not(:disabled) {
+  background: linear-gradient(180deg, var(--btn-c), var(--btn-b));
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.jrpg-btn:disabled {
+  background: #23273a;
+  color: #6b7188;
+  border-color: #3a4058;
+  box-shadow: none;
+  cursor: default;
+}
+
+/* いま選んでいる項目。金の縁 + 左の「▶」でカーソルを出す。
+   十字キーで動かすメニューは、色だけだと今どこにいるのか読み取れない。 */
+.jrpg-btn--on {
+  background: linear-gradient(180deg, #6a5c2a 0%, #4a4019 52%, #322a0f 100%);
+  border-color: var(--ink-gold);
+  color: #fff3cd;
+}
+
+.jrpg-btn--cursor {
+  border-color: var(--ink-gold);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 0 0 1px rgba(255, 217, 122, 0.5),
+    0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+.jrpg-btn--cursor::before {
+  content: '▶';
+  color: var(--ink-gold);
+  margin-right: 0.35em;
+  font-size: 0.8em;
+  vertical-align: 0.05em;
+}
+
+/* 一覧の行として使うボタン。文字は左そろえ。 */
+.jrpg-btn--wide {
+  text-align: left;
+}
+
+/* 「もどる」など、目立たせたくないボタン。 */
+.jrpg-btn--back {
+  background: linear-gradient(180deg, #3a4051 0%, #262b38 100%);
+  border-color: #5b6274;
+  color: #c9cfdd;
+}
+
+/* 「はい」「つづける」など、押してほしいボタン。 */
+.jrpg-btn--primary {
+  background: linear-gradient(180deg, #64763f 0%, #445127 52%, #2f3819 100%);
+  border-color: #b3c884;
+  color: #f0f7dc;
+}
+
+/* 枠の中だけでスクロールさせる細いバー。全画面で共通。 */
+.jrpg-scroll::-webkit-scrollbar { width: 7px; height: 7px; }
+.jrpg-scroll::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 4px; }
+.jrpg-scroll::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 4px; }
+
+/* =======================================================================
+ * 3. 個体の詳細 (components/Common/InstanceDetail.jsx)
+ *    牧場・ふくろ・配合結果・デバッグメニューのどこからでも呼ばれるので、
+ *    画面ごとのCSSではなくここに置く。
+ * ======================================================================= */
+
+.idet {
+  font-size: var(--fs-xs);
+  color: #cfd5e4;
+  line-height: 1.55;
+}
+
+.idet-head {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1.2vw, 12px);
+  margin-bottom: clamp(3px, 0.8vh, 7px);
+}
+
+.idet-head img {
+  width: clamp(38px, 8vh, 60px);
+  height: clamp(38px, 8vh, 60px);
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+.idet-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  color: #fff;
+  line-height: 1.2;
+}
+
+.idet-meta {
+  color: var(--ink-dim);
+}
+
+.idet-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 clamp(8px, 1.6vw, 18px);
+  margin-bottom: clamp(3px, 0.8vh, 7px);
+}
+
+.idet-stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.12);
+}
+
+.idet-stat b {
+  color: var(--ink-good);
+  font-weight: 500;
+}
+
+.idet-stat i {
+  color: #7f879c;
+  font-style: normal;
+  font-size: 0.88em;
+}
+
+.idet-sub {
+  font-family: var(--font-display);
+  color: #9fd4ff;
+  margin: clamp(4px, 1vh, 9px) 0 clamp(1px, 0.4vh, 3px);
+  border-bottom: 1px solid rgba(159, 212, 255, 0.28);
+}
+
+.idet-sub--inherit {
+  color: #e6b972;
+  border-bottom-color: rgba(230, 185, 114, 0.28);
+}
+
+.idet-row {
+  color: #dde2ee;
+}
+
+.idet-row--inherit {
+  color: #c9a870;
+}
+
+.idet-none {
+  color: #767e93;
+}
+
+/* =======================================================================
+ * 4. どうぐの絵 (components/Common/ItemIcon.jsx)
+ *    町・戦闘・ダンジョンのどこにでも出るので、画面ごとのCSSではなくここ。
+ *    素材はドット絵なので、拡大も縮小も必ず補間なし(pixelated)で行う。
+ * ======================================================================= */
+
+.mrg-itemicon {
+  flex-shrink: 0;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* 一覧の行の頭に置くとき(戦闘のどうぐ欄・ダンジョンのどうぐ欄)。
+   画面の高さに追従させる — 844x390 のスマホ横でも行が潰れないように。 */
+.mrg-itemicon--row {
+  width: clamp(17px, 3.6vh, 26px);
+  height: clamp(17px, 3.6vh, 26px);
+  font-size: clamp(9px, 2vh, 14px);
+}
+
+/* 手に入らなかったどうぐ(ふくろが満杯)。暗くして「持てなかった」を出す。 */
+.mrg-itemicon--lost {
+  filter: grayscale(1) brightness(0.6);
+}
+
+/* 絵の無いどうぐ(せいすい)の代わり。大きさは絵と同じで、
+   分類の色の枠に頭文字を入れる。並びが崩れないことが最優先。 */
+.mrg-itemicon--none {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 0.62em;
+  line-height: 1;
+  overflow: hidden;
+}

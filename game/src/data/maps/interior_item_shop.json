@@ -1,0 +1,73 @@
+{
+  "tile_px": 64,
+  "room_tiles": [
+    16,
+    12
+  ],
+  "door_tiles": [
+    [
+      7,
+      10
+    ],
+    [
+      8,
+      10
+    ]
+  ],
+  "collisions": [
+    {
+      "name": "bookshelf_left",
+      "rect_tiles": [
+        2,
+        2,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "bookshelf_right",
+      "rect_tiles": [
+        12,
+        2,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "shop_counter",
+      "rect_tiles": [
+        6,
+        4,
+        3,
+        1
+      ]
+    },
+    {
+      "name": "barrel",
+      "rect_tiles": [
+        2,
+        7,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "chest",
+      "rect_tiles": [
+        3,
+        7,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "pot",
+      "rect_tiles": [
+        12,
+        7,
+        1,
+        1
+      ]
+    }
+  ]
+}

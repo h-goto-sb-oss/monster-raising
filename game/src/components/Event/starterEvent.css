@@ -1,0 +1,144 @@
+/* starterEvent.css
+ * はじまりのイベント。ゲームの1画面目。
+ *
+ * 他の画面と同じ「ビューポート固定 + はみ出すのは中の1か所だけ」。
+ * 縦に積むだけの作りだと 844x390(スマホ横) でページのスクロールバーが出る。
+ */
+
+.stev {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(2px, 0.6vh, 6px);
+  padding: clamp(6px, 1.8vh, 20px) clamp(8px, 2vw, 24px);
+  overflow: hidden;
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 40%, rgba(34, 42, 70, 0.9), rgba(8, 10, 18, 0.98)),
+    #0a0c16;
+}
+
+.stev-title {
+  margin: 0;
+  flex: 0 0 auto;
+  font-family: var(--font-display);
+  font-weight: normal;
+  font-size: var(--fs-xl);
+  color: var(--ink-gold);
+  letter-spacing: 0.08em;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.85);
+}
+
+.stev-lead {
+  flex: 0 0 auto;
+  font-size: var(--fs-sm);
+  color: var(--ink-dim);
+  margin-bottom: clamp(3px, 1vh, 10px);
+}
+
+/* あふれるのはここだけ。 */
+.stev-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.stev-row {
+  display: flex;
+  gap: clamp(6px, 1.6vw, 18px);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stev-card {
+  width: clamp(150px, 24vw, 230px);
+  padding: clamp(5px, 1.4vh, 14px) clamp(6px, 1vw, 12px);
+  text-align: center;
+  color: var(--ink);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.stev-card--on {
+  border-color: var(--ink-gold);
+  background: linear-gradient(180deg, rgba(70, 60, 24, 0.94), rgba(24, 20, 8, 0.96));
+}
+
+.stev-card--done {
+  width: min(460px, 90vw);
+  cursor: default;
+}
+
+.stev-sprite {
+  width: clamp(48px, 13vh, 92px);
+  height: clamp(48px, 13vh, 92px);
+  object-fit: contain;
+  image-rendering: pixelated;
+  display: block;
+  margin: 0 auto;
+}
+
+.stev-big {
+  width: clamp(64px, 18vh, 120px);
+  height: clamp(64px, 18vh, 120px);
+  object-fit: contain;
+  image-rendering: pixelated;
+  display: block;
+  margin: 0 auto;
+}
+
+.stev-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  margin-top: clamp(2px, 0.7vh, 7px);
+}
+
+.stev-meta {
+  font-size: var(--fs-xs);
+  color: var(--ink-dim);
+  margin-bottom: clamp(2px, 0.7vh, 7px);
+}
+
+.stev-join {
+  font-size: var(--fs-sm);
+  color: var(--ink-gold);
+  margin-top: clamp(4px, 1.2vh, 12px);
+}
+
+.stev-note {
+  font-size: var(--fs-xs);
+  color: var(--ink-dim);
+  line-height: 1.6;
+  margin-top: clamp(3px, 0.8vh, 8px);
+}
+
+.stev-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 clamp(6px, 1vw, 12px);
+  font-size: var(--fs-xs);
+  color: #bcc4d6;
+}
+
+.stev-stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.stev-foot {
+  flex: 0 0 auto;
+  padding-top: clamp(4px, 1.2vh, 12px);
+}
+
+.stev-foot .jrpg-btn {
+  font-size: var(--fs-md);
+  padding: clamp(5px, 1.4vh, 11px) clamp(14px, 3vw, 28px);
+}

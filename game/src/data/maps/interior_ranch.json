@@ -1,0 +1,82 @@
+{
+  "tile_px": 64,
+  "room_tiles": [
+    16,
+    12
+  ],
+  "door_tiles": [
+    [
+      7,
+      10
+    ],
+    [
+      8,
+      10
+    ]
+  ],
+  "collisions": [
+    {
+      "name": "trough_left",
+      "rect_tiles": [
+        2,
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "name": "trough_center",
+      "rect_tiles": [
+        6,
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "name": "partition",
+      "rect_tiles": [
+        10,
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "name": "hay_bale",
+      "rect_tiles": [
+        2,
+        6,
+        2,
+        1
+      ]
+    },
+    {
+      "name": "straw",
+      "rect_tiles": [
+        6,
+        6,
+        2,
+        1
+      ]
+    },
+    {
+      "name": "barrel",
+      "rect_tiles": [
+        11,
+        6,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "crate",
+      "rect_tiles": [
+        12,
+        6,
+        1,
+        1
+      ]
+    }
+  ]
+}

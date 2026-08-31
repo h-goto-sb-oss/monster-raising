@@ -1,0 +1,539 @@
+{
+  "tile_px": 64,
+  "map_tiles": [
+    32,
+    24
+  ],
+  "doors": {
+    "home": [
+      6,
+      8
+    ],
+    "church": [
+      16,
+      8
+    ],
+    "item_shop": [
+      26,
+      8
+    ],
+    "ranch": [
+      6,
+      20
+    ],
+    "breeding": [
+      25,
+      20
+    ]
+  },
+  "collisions": [
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        0,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        1,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        2,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        3,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        4,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        5,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        6,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        7,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        8,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        9,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        10,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        11,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        12,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        13,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        14,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        15,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        16,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        17,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        18,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        19,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        20,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        21,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        22,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        23,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        24,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        25,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        26,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        27,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        28,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        29,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        30,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "cliff",
+      "rect_tiles": [
+        31,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "building",
+      "name": "home",
+      "rect_tiles": [
+        3,
+        4,
+        6,
+        5
+      ]
+    },
+    {
+      "kind": "building",
+      "name": "church",
+      "rect_tiles": [
+        13,
+        3,
+        6,
+        6
+      ]
+    },
+    {
+      "kind": "building",
+      "name": "item_shop",
+      "rect_tiles": [
+        23,
+        4,
+        6,
+        5
+      ]
+    },
+    {
+      "kind": "building",
+      "name": "ranch",
+      "rect_tiles": [
+        3,
+        15,
+        7,
+        6
+      ]
+    },
+    {
+      "kind": "building",
+      "name": "breeding",
+      "rect_tiles": [
+        22,
+        15,
+        7,
+        6
+      ]
+    },
+    {
+      "kind": "prop",
+      "name": "tree_a",
+      "rect_tiles": [
+        0,
+        4,
+        2,
+        2
+      ]
+    },
+    {
+      "kind": "prop",
+      "name": "fruit_tree",
+      "rect_tiles": [
+        30,
+        5,
+        2,
+        2
+      ]
+    },
+    {
+      "kind": "prop",
+      "name": "pine",
+      "rect_tiles": [
+        0,
+        15,
+        2,
+        2
+      ]
+    },
+    {
+      "kind": "prop",
+      "name": "tree_b",
+      "rect_tiles": [
+        30,
+        16,
+        2,
+        2
+      ]
+    },
+    {
+      "kind": "prop",
+      "name": "well",
+      "rect_tiles": [
+        10,
+        15,
+        2,
+        2
+      ]
+    },
+    {
+      "kind": "prop",
+      "name": "bench_a",
+      "rect_tiles": [
+        11,
+        11,
+        2,
+        1
+      ]
+    },
+    {
+      "kind": "prop",
+      "name": "bench_b",
+      "rect_tiles": [
+        19,
+        11,
+        2,
+        1
+      ]
+    },
+    {
+      "kind": "prop",
+      "name": "lamp_a",
+      "rect_tiles": [
+        12,
+        8,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "prop",
+      "name": "lamp_b",
+      "rect_tiles": [
+        19,
+        8,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "prop",
+      "name": "sign",
+      "rect_tiles": [
+        16,
+        20,
+        1,
+        1
+      ]
+    },
+    {
+      "kind": "fence",
+      "name": "fence_h_2",
+      "rect_tiles": [
+        2,
+        22,
+        2,
+        1
+      ]
+    },
+    {
+      "kind": "fence",
+      "name": "fence_h_4",
+      "rect_tiles": [
+        4,
+        22,
+        2,
+        1
+      ]
+    },
+    {
+      "kind": "fence",
+      "name": "fence_h_6",
+      "rect_tiles": [
+        6,
+        22,
+        2,
+        1
+      ]
+    },
+    {
+      "kind": "fence",
+      "name": "fence_h_8",
+      "rect_tiles": [
+        8,
+        22,
+        2,
+        1
+      ]
+    },
+    {
+      "kind": "fence",
+      "name": "fence_v_16",
+      "rect_tiles": [
+        2,
+        16,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "fence",
+      "name": "fence_v_18",
+      "rect_tiles": [
+        2,
+        18,
+        1,
+        2
+      ]
+    },
+    {
+      "kind": "fence",
+      "name": "fence_v_20",
+      "rect_tiles": [
+        2,
+        20,
+        1,
+        2
+      ]
+    }
+  ]
+}

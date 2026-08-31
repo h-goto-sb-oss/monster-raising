@@ -1,0 +1,25 @@
+# ---- 依存パッケージ・ビルド成果物 ----
+node_modules/
+game/dist/
+game/dist-pages/
+__pycache__/
+*.pyc
+
+# ---- 素材の元データ (合計200MB超) ----
+# 正規化前後のシート・スプライト・QA画像。
+# ゲームが実際に使う285体は game/public/assets/monsters/ に取り込み済みなので、
+# 遊ぶだけ・手を入れるだけならこれは要らない。手元のPCにだけ残しておく。
+monster_project/step1_normalized/
+
+# 画像をbase64で焼き込んだ確認用の一枚ページ (1枚35MB前後)。
+# monster_project/build_*.py で作り直せるので置かない。
+monster_project/*.html
+monster_project/step2_dedup/*.html
+monster_project/step2_dedup/*.jpg
+
+# ---- OS・エディタが勝手に作るもの ----
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

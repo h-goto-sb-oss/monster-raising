@@ -1,0 +1,61 @@
+{
+  "tile_px": 64,
+  "room_tiles": [
+    16,
+    12
+  ],
+  "door_tiles": [
+    [
+      7,
+      10
+    ],
+    [
+      8,
+      10
+    ]
+  ],
+  "collisions": [
+    {
+      "name": "records_counter",
+      "rect_tiles": [
+        2,
+        2,
+        3,
+        1
+      ]
+    },
+    {
+      "name": "genealogy_lectern",
+      "rect_tiles": [
+        11,
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "bookshelf_a",
+      "rect_tiles": [
+        2,
+        6,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "bookshelf_b",
+      "rect_tiles": [
+        12,
+        6,
+        1,
+        2
+      ]
+    }
+  ],
+  "reserved_device_rect_tiles": [
+    5,
+    3,
+    5,
+    4
+  ]
+}

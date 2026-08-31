@@ -1,0 +1,774 @@
+/* townUI.css
+ * 拠点の町。ボタンの一覧ではなく「クリックできる町の絵」にする。
+ *
+ * 位置はすべて % 指定、大きさは vh 基準の clamp() なので、
+ * スマホ横(高さ390px)でも 1280x720 でも同じ構図のまま縮む。
+ *
+ * NOTE: 素材集は歩けるマップ用に作られている
+ *   (8コマの歩行アニメ、grid_v2/GRID_SPEC.md の64pxグリッド、
+ *    dungeon/maps の階層マップ+イベントJSON)。
+ *   ここではまだ歩かせず、絵として置いてクリックさせるだけ。
+ *   歩けるマップ化は別フェーズの大きめの機能。
+ */
+
+html.mrg-town-lock,
+html.mrg-town-lock body {
+  overflow: hidden;
+  height: 100%;
+}
+
+.town {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  color: #f2efe4;
+  -webkit-user-select: none;
+  user-select: none;
+  /* 草地タイルを敷きつめ、周囲をわずかに落として真ん中に視線を集める。 */
+  background-image:
+    radial-gradient(ellipse 78% 82% at 50% 55%, rgba(0, 0, 0, 0) 40%, rgba(6, 18, 8, 0.45) 100%),
+    url('/assets/terrain/grass.png');
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 100%, clamp(48px, 13vh, 96px);
+  image-rendering: pixelated;
+}
+
+/* 中央の石畳の広場 */
+.town-plaza {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  transform: translate(-50%, -50%);
+  width: min(62vw, 720px);
+  height: clamp(70px, 26vh, 190px);
+  border-radius: 50%;
+  background-image: url('/assets/terrain/stone.png');
+  background-size: clamp(40px, 11vh, 80px);
+  image-rendering: pixelated;
+  /* ふちを草地にとかしてタイルの切れ目を目立たせない */
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 58%, rgba(0, 0, 0, 0) 100%);
+  mask-image: radial-gradient(ellipse at center, #000 58%, rgba(0, 0, 0, 0) 100%);
+}
+
+.town-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: clamp(4px, 1vw, 10px);
+  padding: clamp(4px, 1vh, 10px) clamp(6px, 1.4vw, 16px);
+  z-index: 20;
+}
+
+.town-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: normal;
+  letter-spacing: 0.08em;
+  color: #fff6df;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.75), 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.town-hint {
+  font-size: var(--fs-xs);
+  color: #eaf2ff;
+  background: rgba(8, 11, 22, 0.6);
+  border: 1px solid rgba(201, 177, 131, 0.45);
+  border-radius: 3px;
+  padding: 1px clamp(4px, 0.8vw, 9px);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+}
+
+/* --- クリックできる建物 / 人物 ----------------------------------------- */
+
+.town-spot {
+  position: absolute;
+  /* 座標は「足元(下辺)の中央」を指す */
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+}
+
+.town-spot img {
+  display: block;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.45));
+  transition: transform 0.12s ease;
+}
+
+.town-spot:hover img,
+.town-spot:focus-visible img {
+  transform: translateY(-4px) scale(1.04);
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.5)) brightness(1.12);
+}
+
+.town-spot--building img {
+  width: clamp(74px, 27vh, 200px);
+  height: clamp(74px, 27vh, 200px);
+  object-fit: contain;
+}
+
+.town-spot--npc img {
+  width: clamp(40px, 14vh, 100px);
+  height: clamp(40px, 14vh, 100px);
+  object-fit: contain;
+}
+
+.town-plate {
+  font-size: var(--fs-sm);
+  font-weight: bold;
+  white-space: nowrap;
+  padding: 1px clamp(4px, 0.8vw, 9px);
+  border-radius: 3px;
+  background: rgba(8, 11, 22, 0.78);
+  border: 1px solid rgba(201, 177, 131, 0.65);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9);
+}
+
+.town-spot:hover .town-plate,
+.town-spot:focus-visible .town-plate {
+  background: rgba(30, 24, 8, 0.9);
+  border-color: #f2d16b;
+  color: #ffe9a8;
+}
+
+/* 建物の前に立つ看板役の人物。クリックは建物側にまかせる。 */
+.town-deco {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.45));
+}
+
+/* --- 施設パネル(教会/どうぐ屋/あずけ所…)の背景 ------------------------ */
+
+.facility {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(8px, 2vh, 28px);
+  font-family: var(--font-ui);
+}
+
+.facility::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--facility-bg);
+  background-size: cover;
+  background-position: center;
+  image-rendering: pixelated;
+  opacity: 0.3;
+  filter: saturate(0.85);
+}
+
+.facility::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(10, 13, 24, 0.45), rgba(8, 10, 18, 0.9));
+}
+
+.facility-card {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 94vw);
+  max-height: 94dvh;
+  overflow-y: auto;
+  padding: clamp(10px, 2.4vh, 26px) clamp(12px, 2.4vw, 28px);
+  text-align: center;
+  background: linear-gradient(180deg, rgba(22, 28, 50, 0.94), rgba(8, 11, 22, 0.96));
+  border: 2px solid #c9b183;
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 0 2px rgba(6, 8, 16, 0.9),
+    0 6px 24px rgba(0, 0, 0, 0.6);
+}
+
+.facility-npc {
+  width: clamp(72px, 18vh, 132px);
+  height: clamp(72px, 18vh, 132px);
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.55));
+}
+
+.facility-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 1.5vw, 16px);
+  margin-bottom: clamp(4px, 1vh, 12px);
+}
+
+.facility-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  color: #f2d16b;
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* 一覧系の画面(牧場/配合)のヘッダーに置く小さな人物 */
+.npc-badge {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  vertical-align: middle;
+  margin-right: 8px;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+
+/* --- ダンジョン入口 -----------------------------------------------------
+ * 12本を一覧するので、素直に縦へ並べるとスマホ横(高さ390px)で
+ * ページごとスクロールしてしまう。戦闘画面と同じく
+ *   「ルートはビューポート固定、はみ出す部分だけ内側でスクロール」
+ * にして、ページのスクロールバーは絶対に出さない。
+ * カードは背景画のサムネイルをそのまま敷いて、どこへ潜るのか絵で分かるようにする。
+ */
+
+html.mrg-dungeon-lock,
+html.mrg-dungeon-lock body {
+  overflow: hidden;
+  height: 100%;
+}
+
+.dsel {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(4px, 1.2vh, 12px) clamp(6px, 1.4vw, 18px);
+  gap: clamp(3px, 0.8vh, 8px);
+  font-family: var(--font-ui);
+  color: #f2efe4;
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 40%, rgba(30, 38, 62, 0.9), rgba(8, 10, 18, 0.98)),
+    #0b0e18;
+  overflow: hidden;
+}
+
+.dsel-head {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(5px, 1.2vw, 14px);
+  flex: 0 0 auto;
+}
+
+.dsel-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  color: #f2d16b;
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.8);
+}
+
+.dsel-sub {
+  font-size: var(--fs-xs);
+  color: #9aa3bd;
+}
+
+.dsel-warn {
+  font-size: var(--fs-xs);
+  color: #e08a4d;
+}
+
+/* はみ出すのはこの中だけ。ページ本体はスクロールしない。 */
+.dsel-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(148px, 24vw, 300px), 1fr));
+  gap: clamp(4px, 0.9vh, 9px);
+  padding-right: 3px;
+  align-content: start;
+}
+
+.dsel-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1px;
+  min-height: clamp(62px, 20vh, 150px);
+  padding: clamp(3px, 0.8vh, 8px) clamp(5px, 0.8vw, 10px);
+  border: 2px solid #c9b183;
+  border-radius: 3px;
+  background-size: cover;
+  background-position: center 38%;
+  image-rendering: pixelated;
+  color: #f2efe4;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 2px rgba(6, 8, 16, 0.9), 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* 背景画の上に文字を乗せるので、下側を必ず暗く落とす。 */
+.dsel-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 8, 16, 0.25) 0%, rgba(6, 8, 16, 0.55) 45%, rgba(6, 8, 16, 0.92) 100%);
+}
+
+.dsel-card > * {
+  position: relative;
+}
+
+.dsel-card:hover:not(:disabled) {
+  border-color: #f2d16b;
+}
+
+.dsel-card:hover:not(:disabled)::before {
+  background: linear-gradient(180deg, rgba(6, 8, 16, 0.1) 0%, rgba(6, 8, 16, 0.45) 45%, rgba(6, 8, 16, 0.88) 100%);
+}
+
+.dsel-card--locked {
+  cursor: default;
+  border-color: #4a4f5e;
+  filter: grayscale(1);
+}
+
+.dsel-card--locked::before {
+  background: rgba(6, 8, 16, 0.86);
+}
+
+.dsel-card--cleared {
+  border-color: #a9c07a;
+}
+
+.dsel-card:disabled {
+  cursor: default;
+}
+
+.dsel-no {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0 clamp(3px, 0.5vw, 6px);
+  font-size: var(--fs-xs);
+  color: #0b0e18;
+  background: rgba(201, 177, 131, 0.9);
+  border-bottom-right-radius: 3px;
+  font-weight: bold;
+}
+
+.dsel-badge {
+  position: absolute;
+  top: clamp(2px, 0.5vh, 5px);
+  right: clamp(2px, 0.4vw, 5px);
+  padding: 0 clamp(3px, 0.5vw, 6px);
+  font-size: var(--fs-xs);
+  border-radius: 2px;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.dsel-badge--cleared { background: #5d6d3c; color: #e6f2c6; }
+.dsel-badge--locked { background: #3a3f4d; color: #9aa3bd; }
+.dsel-badge--next { background: #f2d16b; color: #2a1f00; }
+
+.dsel-name {
+  font-size: var(--fs-sm);
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.8);
+}
+
+.dsel-meta {
+  display: flex;
+  gap: clamp(3px, 0.6vw, 8px);
+  font-size: var(--fs-xs);
+  color: #cfd6e6;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.95);
+  white-space: nowrap;
+}
+
+.dsel-meta b {
+  color: #f2d16b;
+  font-weight: bold;
+}
+
+.dsel-foot {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dsel-desc {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--fs-xs);
+  color: #9aa3bd;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dsel-back {
+  flex: 0 0 auto;
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  padding: clamp(3px, 0.8vh, 7px) clamp(8px, 1.6vw, 18px);
+  background: linear-gradient(180deg, #3a4363, #222941);
+  color: #f2efe4;
+  border: 1px solid #7683a8;
+  border-radius: 3px;
+}
+
+.dsel-back:hover { border-color: #f2d16b; }
+
+.dsel *::-webkit-scrollbar { width: 6px; }
+.dsel *::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.25); }
+.dsel *::-webkit-scrollbar-thumb { background: rgba(201, 177, 131, 0.45); border-radius: 3px; }
+
+/* =======================================================================
+ * どうぐぶくろ (ItemBag.jsx)
+ *
+ * どうぐの絵が入って一覧が「行」から「タイル」になった。タイルは背が高く、
+ * 20スロットぶん縦に積むとページが2〜3画面ぶんに伸びる。
+ * そこで画面じたいを固定にして、あふれるのは中の2か所(どうぐの一覧と右の欄)
+ * だけにしてある。ページのスクロールバーは出ない = 844x390 に収まる。
+ * ======================================================================= */
+
+.bag {
+  position: fixed;
+  inset: 0;
+  /* フィールドのメニューから開くと、十字キー(fieldUI.css: z-index 4)の
+     上に重ねる必要がある。単独の画面として出すときは効いても害がない。 */
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3px, 0.8vh, 7px);
+  padding: clamp(6px, 1.6vh, 14px) clamp(8px, 1.6vw, 18px);
+  overflow: hidden;
+  background: #14161f;
+  color: #f2efe4;
+  font-family: var(--font-ui);
+}
+
+.bag-head {
+  display: flex;
+  align-items: center;
+  gap: clamp(5px, 1.2vw, 10px);
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+}
+
+.bag-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: normal;
+  color: #f2d16b;
+}
+
+.bag-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-sm);
+  padding: clamp(2px, 0.6vh, 5px) clamp(6px, 1.2vw, 12px);
+  border-radius: 6px;
+  background: #1c2030;
+  color: #ffd24d;
+  border: 1px solid #555;
+}
+
+.bag-chip--full {
+  background: #5c2a2a;
+  color: #ffb0b0;
+}
+
+.bag-chip--gold {
+  background: #221c10;
+  border-color: #6b5a2a;
+}
+
+.bag-chip--gold img {
+  width: clamp(13px, 2.6vh, 18px);
+  height: clamp(13px, 2.6vh, 18px);
+  image-rendering: pixelated;
+}
+
+.bag-back {
+  margin-left: auto;
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  padding: clamp(3px, 0.8vh, 7px) clamp(8px, 1.6vw, 18px);
+  background: linear-gradient(180deg, #3a4363, #222941);
+  color: #f2efe4;
+  border: 1px solid #7683a8;
+  border-radius: 3px;
+}
+
+.bag-back:hover { border-color: #f2d16b; }
+
+.bag-note {
+  flex: 0 0 auto;
+  font-size: var(--fs-xs);
+  color: #888;
+  line-height: 1.4;
+}
+
+.bag-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  gap: clamp(6px, 1.4vw, 14px);
+}
+
+/* どうぐの一覧。ここだけが縦にあふれる。 */
+.bag-items {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.bag-group { margin-bottom: clamp(4px, 1.2vh, 10px); }
+
+.bag-grouphead {
+  font-size: var(--fs-xs);
+  color: #8b93ab;
+  margin-bottom: 3px;
+}
+
+.bag-grid {
+  display: grid;
+  /* 名前が「とくじょうやくそう」でも1行に収まる幅を下限にする */
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: clamp(3px, 0.8vh, 6px);
+}
+
+.bag-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 3px 4px;
+  background: #1c2030;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: var(--fs-xs);
+}
+
+.bag-tile:hover { border-color: #7683a8; }
+
+.bag-tile--on {
+  background: #2b2a1c;
+  border-color: #ffd24d;
+  box-shadow: inset 0 0 0 1px #ffd24d;
+}
+
+.bag-tile--battle {
+  color: #9a9a9a;
+  opacity: 0.75;
+}
+
+.bag-tilename {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.bag-tilecount {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  font-size: var(--fs-xs);
+  color: #ffd24d;
+  background: rgba(8, 10, 18, 0.85);
+  border-radius: 3px;
+  padding: 0 3px;
+}
+
+.bag-tilebattle {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  font-size: var(--fs-xs);
+  color: #e08a4d;
+  background: rgba(8, 10, 18, 0.85);
+  border-radius: 3px;
+  padding: 0 3px;
+}
+
+/* --- 右の欄: えらんだどうぐ / モンスター / 個体の詳細 ------------------- */
+
+.bag-side {
+  flex: 0 0 clamp(190px, 32vw, 290px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 1vh, 8px);
+  min-height: 0;
+}
+
+.bag-card {
+  flex: 0 0 auto;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #181c28;
+  padding: clamp(5px, 1.2vh, 10px);
+  font-size: var(--fs-xs);
+}
+
+.bag-card--idle { color: #666; }
+
+.bag-cardhead {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 5px;
+}
+
+.bag-cardname { color: #ffd24d; }
+
+.bag-carddesc {
+  color: #aaa;
+  font-size: 0.9em;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.bag-warn { color: #e08a4d; }
+.bag-hint { color: #888; margin-bottom: 4px; }
+.bag-result { color: #7ee08a; margin-top: 5px; }
+.bag-empty { color: #666; font-size: var(--fs-xs); }
+
+.bag-use {
+  font-family: inherit;
+  font-size: inherit;
+  padding: clamp(3px, 0.8vh, 6px) clamp(10px, 2vw, 18px);
+  background: #2a2f42;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+
+.bag-use:disabled { background: #2a2a2a; color: #666; }
+
+.bag-sidescroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.bag-mons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 5px;
+}
+
+.bag-mon {
+  padding: 4px;
+  background: #1c2030;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  text-align: center;
+  font-family: inherit;
+  font-size: var(--fs-xs);
+}
+
+.bag-mon--on { background: #2b2a1c; border-color: #ffd24d; }
+.bag-mon--down { opacity: 0.55; }
+
+.bag-mon img {
+  width: clamp(28px, 6vh, 40px);
+  height: clamp(28px, 6vh, 40px);
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.bag-monname {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bag-monhp { color: #8fa; font-size: 0.92em; }
+.bag-mondown { color: #e08a4d; font-size: 0.92em; }
+.bag-monmp { color: #4d9dff; font-size: 0.92em; }
+
+.bag *::-webkit-scrollbar { width: 6px; }
+.bag *::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.25); }
+.bag *::-webkit-scrollbar-thumb { background: rgba(201, 177, 131, 0.45); border-radius: 3px; }
+
+/* 一覧系の画面(牧場・配合)の見出し。他の画面と同じ書体・大きさにそろえる。 */
+.town-screentitle {
+  margin: 0 0 clamp(4px, 1vh, 10px);
+  font-family: var(--font-display);
+  font-weight: normal;
+  font-size: var(--fs-lg);
+  color: var(--ink-gold);
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+}
+
+/* 一覧系の画面(牧場・配合)の外枠。
+ *
+ * ビューポートに固定して、あふれるのは **この箱の中だけ** にする。
+ * position:fixed なので本文(body)は伸びず、ページのスクロールバーが出ない。
+ * 844x390 のスマホ横で、画面の外にボタンが逃げていくのを防ぐための決まりごと
+ * (戦闘・フィールド・ふくろ・ダンジョン入口と同じ作り)。
+ */
+.town-screen {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(8px, 2vh, 22px) clamp(10px, 2vw, 24px);
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 35%, rgba(30, 38, 62, 0.9), rgba(8, 10, 18, 0.98)),
+    #0a0c16;
+}
+
+.town-screen-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.town-screennote {
+  font-size: var(--fs-xs);
+  color: var(--ink-dim);
+  line-height: 1.6;
+  margin-bottom: clamp(5px, 1.4vh, 14px);
+}
+
+/* この画面の中のスクロールバーも細い金色にそろえる(既定の白い帯が目立つ)。 */
+.town-screen *::-webkit-scrollbar { width: 7px; height: 7px; }
+.town-screen *::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 4px; }
+.town-screen *::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 4px; }

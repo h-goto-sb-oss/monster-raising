@@ -1,0 +1,1916 @@
+[
+  {
+    "id": "dungeon_01",
+    "name": "はじまりの草原",
+    "description": "町の門を出てすぐ、風のやわらかい草原。のんびりした魔物しかいない。まずはここで一歩を踏み出そう。",
+    "background": "grassland",
+    "recommendedLevel": 1,
+    "partySizeHint": 1,
+    "locked": false,
+    "floors": 1,
+    "encounterSteps": 13,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 1,
+        "enemies": [
+          {
+            "id": "G2-01",
+            "level": 1
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 1,
+        "enemies": [
+          {
+            "id": "G2-11",
+            "level": 1
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 3,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "G2-15",
+            "level": 3
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_yakusou",
+        "count": 3
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 25,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_jouyakusou",
+          "count": 2,
+          "weight": 4
+        },
+        {
+          "itemId": "item_mezamenosuzu",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_mahinaoshinotsuyu",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_hoshiniku",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_kimeranotsubasa",
+          "count": 1,
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_02",
+    "name": "そよかぜの小道",
+    "description": "草原の先へ続く、踏みならされた小道。草かげから弱い魔物が顔を出す。仲間が1体ふえたら来るとよい。",
+    "background": "grassland",
+    "recommendedLevel": 3,
+    "partySizeHint": 2,
+    "locked": true,
+    "floors": 1,
+    "encounterSteps": 13,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 2,
+        "enemies": [
+          {
+            "id": "U1-22",
+            "level": 2
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 2,
+        "enemies": [
+          {
+            "id": "U2-05",
+            "level": 2
+          },
+          {
+            "id": "U2-12",
+            "level": 2
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 4,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "U3-03",
+            "level": 4
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_yakusou",
+        "count": 3
+      },
+      {
+        "itemId": "item_dokukeshisou",
+        "count": 2
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 45,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_jouyakusou",
+          "count": 2,
+          "weight": 4
+        },
+        {
+          "itemId": "item_mezamenosuzu",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_mahinaoshinotsuyu",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_hoshiniku",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_kimeranotsubasa",
+          "count": 1,
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_03",
+    "name": "ざわめきの樹海",
+    "description": "見上げるほどの木々が日をさえぎる森。虫の羽音と、草をかき分ける足音が絶えない。",
+    "background": "grassland",
+    "recommendedLevel": 5,
+    "partySizeHint": 2,
+    "locked": true,
+    "floors": 2,
+    "encounterSteps": 16,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 3,
+        "enemies": [
+          {
+            "id": "U1-12",
+            "level": 3
+          },
+          {
+            "id": "U1-16",
+            "level": 3
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 3,
+        "enemies": [
+          {
+            "id": "U1-27",
+            "level": 3
+          },
+          {
+            "id": "U2-09",
+            "level": 3
+          }
+        ]
+      },
+      {
+        "id": "encounter_3",
+        "level": 4,
+        "enemies": [
+          {
+            "id": "U2-19",
+            "level": 4
+          },
+          {
+            "id": "U3-02",
+            "level": 4
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 6,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "U3-09",
+            "level": 6
+          },
+          {
+            "id": "U3-08",
+            "level": 4
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_jouyakusou",
+        "count": 2
+      },
+      {
+        "itemId": "item_mahounomizu",
+        "count": 2
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 70,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_jouyakusou",
+          "count": 3,
+          "weight": 4
+        },
+        {
+          "itemId": "item_seinarumizu",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_maryokunoshizuku",
+          "count": 1,
+          "weight": 3
+        },
+        {
+          "itemId": "item_bannouyaku",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_hoshiniku",
+          "count": 2,
+          "weight": 2
+        },
+        {
+          "itemId": "item_kimeranotsubasa",
+          "count": 2,
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_04",
+    "name": "こだまの洞窟",
+    "description": "足音がいつまでも返ってくる横穴。灯りの届かない奥で、硬いものが動く気配がする。",
+    "background": "cave",
+    "recommendedLevel": 7,
+    "partySizeHint": 3,
+    "locked": true,
+    "floors": 2,
+    "encounterSteps": 13,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 4,
+        "enemies": [
+          {
+            "id": "U2-18",
+            "level": 4
+          },
+          {
+            "id": "U3-21",
+            "level": 4
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 4,
+        "enemies": [
+          {
+            "id": "G1-01",
+            "level": 4
+          },
+          {
+            "id": "G1-03",
+            "level": 4
+          },
+          {
+            "id": "G1-04",
+            "level": 4
+          }
+        ]
+      },
+      {
+        "id": "encounter_3",
+        "level": 5,
+        "enemies": [
+          {
+            "id": "G1-05",
+            "level": 5
+          },
+          {
+            "id": "G1-06",
+            "level": 5
+          },
+          {
+            "id": "G1-07",
+            "level": 5
+          }
+        ]
+      },
+      {
+        "id": "encounter_4",
+        "level": 6,
+        "enemies": [
+          {
+            "id": "G1-08",
+            "level": 6
+          },
+          {
+            "id": "G1-09",
+            "level": 6
+          },
+          {
+            "id": "G1-10",
+            "level": 6
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 9,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "U2-18",
+            "level": 9
+          },
+          {
+            "id": "G1-11",
+            "level": 6
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_jouyakusou",
+        "count": 3
+      },
+      {
+        "itemId": "item_hoshiniku",
+        "count": 1
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 90,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_jouyakusou",
+          "count": 3,
+          "weight": 4
+        },
+        {
+          "itemId": "item_seinarumizu",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_maryokunoshizuku",
+          "count": 1,
+          "weight": 3
+        },
+        {
+          "itemId": "item_bannouyaku",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_hoshiniku",
+          "count": 2,
+          "weight": 2
+        },
+        {
+          "itemId": "item_kimeranotsubasa",
+          "count": 2,
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_05",
+    "name": "忘れられた坑道",
+    "description": "掘りかけのまま捨てられた坑道。錆びたトロッコの向こうから、毒のにおいが流れてくる。",
+    "background": "cave",
+    "recommendedLevel": 9,
+    "partySizeHint": 3,
+    "locked": true,
+    "floors": 3,
+    "encounterSteps": 14,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 4,
+        "enemies": [
+          {
+            "id": "U1-07",
+            "level": 4
+          },
+          {
+            "id": "U2-08",
+            "level": 4
+          },
+          {
+            "id": "U5-18",
+            "level": 4
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 5,
+        "enemies": [
+          {
+            "id": "U2-24",
+            "level": 5
+          },
+          {
+            "id": "U3-30",
+            "level": 5
+          },
+          {
+            "id": "U5-20",
+            "level": 5
+          }
+        ]
+      },
+      {
+        "id": "encounter_3",
+        "level": 6,
+        "enemies": [
+          {
+            "id": "G1-12",
+            "level": 6
+          },
+          {
+            "id": "G1-13",
+            "level": 6
+          },
+          {
+            "id": "U5-29",
+            "level": 6
+          }
+        ]
+      },
+      {
+        "id": "encounter_4",
+        "level": 7,
+        "enemies": [
+          {
+            "id": "G1-14",
+            "level": 7
+          },
+          {
+            "id": "G1-15",
+            "level": 7
+          },
+          {
+            "id": "G3-02",
+            "level": 7
+          }
+        ]
+      },
+      {
+        "id": "encounter_5",
+        "level": 7,
+        "enemies": [
+          {
+            "id": "G1-16",
+            "level": 7
+          },
+          {
+            "id": "G1-17",
+            "level": 7
+          },
+          {
+            "id": "G3-03",
+            "level": 7
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 10,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "U5-18",
+            "level": 10
+          },
+          {
+            "id": "G3-04",
+            "level": 7
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_jouyakusou",
+        "count": 3
+      },
+      {
+        "itemId": "item_sekaijunoha",
+        "count": 1
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 115,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_tokujouyakusou",
+          "count": 1,
+          "weight": 4
+        },
+        {
+          "itemId": "item_maryokunoshizuku",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_bannouyaku",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_sekaijunoha",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_chikaranotane",
+          "count": 1,
+          "weight": 1
+        },
+        {
+          "itemId": "item_mamorinotane",
+          "count": 1,
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_06",
+    "name": "苔むした神殿址",
+    "description": "名も残らぬ神を祀っていた石造りの址。倒れた柱のあいだを、古い気配がさまよっている。",
+    "background": "ancient_ruins",
+    "recommendedLevel": 12,
+    "partySizeHint": 3,
+    "locked": true,
+    "floors": 3,
+    "encounterSteps": 14,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 6,
+        "enemies": [
+          {
+            "id": "U2-22",
+            "level": 6
+          },
+          {
+            "id": "G1-02",
+            "level": 6
+          },
+          {
+            "id": "G3-05",
+            "level": 6
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 7,
+        "enemies": [
+          {
+            "id": "G1-18",
+            "level": 7
+          },
+          {
+            "id": "G1-19",
+            "level": 7
+          },
+          {
+            "id": "G3-12",
+            "level": 7
+          }
+        ]
+      },
+      {
+        "id": "encounter_3",
+        "level": 8,
+        "enemies": [
+          {
+            "id": "G1-20",
+            "level": 8
+          },
+          {
+            "id": "G1-21",
+            "level": 8
+          },
+          {
+            "id": "G3-15",
+            "level": 8
+          }
+        ]
+      },
+      {
+        "id": "encounter_4",
+        "level": 9,
+        "enemies": [
+          {
+            "id": "G1-22",
+            "level": 9
+          },
+          {
+            "id": "G1-23",
+            "level": 9
+          },
+          {
+            "id": "G3-26",
+            "level": 9
+          }
+        ]
+      },
+      {
+        "id": "encounter_5",
+        "level": 10,
+        "enemies": [
+          {
+            "id": "G1-24",
+            "level": 10
+          },
+          {
+            "id": "G1-25",
+            "level": 10
+          },
+          {
+            "id": "G3-30",
+            "level": 10
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 13,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "U5-15",
+            "level": 13
+          },
+          {
+            "id": "U5-11",
+            "level": 10
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_jouyakusou",
+        "count": 3
+      },
+      {
+        "itemId": "item_mezamenosuzu",
+        "count": 2
+      },
+      {
+        "itemId": "item_chikaranotane",
+        "count": 1
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 145,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_tokujouyakusou",
+          "count": 1,
+          "weight": 4
+        },
+        {
+          "itemId": "item_maryokunoshizuku",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_bannouyaku",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_sekaijunoha",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_chikaranotane",
+          "count": 1,
+          "weight": 1
+        },
+        {
+          "itemId": "item_mamorinotane",
+          "count": 1,
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_07",
+    "name": "常冬の裾野",
+    "description": "一年じゅう雪が解けない山のふもと。吹きさらしの斜面を、白い影がゆっくりと横切る。",
+    "background": "snow_mountain",
+    "recommendedLevel": 15,
+    "partySizeHint": 3,
+    "locked": true,
+    "floors": 3,
+    "encounterSteps": 14,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 8,
+        "enemies": [
+          {
+            "id": "U1-03",
+            "level": 8
+          },
+          {
+            "id": "U5-13",
+            "level": 8
+          },
+          {
+            "id": "U5-17",
+            "level": 8
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 9,
+        "enemies": [
+          {
+            "id": "U1-11",
+            "level": 9
+          },
+          {
+            "id": "U6-07",
+            "level": 9
+          },
+          {
+            "id": "U6-19",
+            "level": 9
+          }
+        ]
+      },
+      {
+        "id": "encounter_3",
+        "level": 10,
+        "enemies": [
+          {
+            "id": "U1-21",
+            "level": 10
+          },
+          {
+            "id": "G3-01",
+            "level": 10
+          },
+          {
+            "id": "G3-16",
+            "level": 10
+          }
+        ]
+      },
+      {
+        "id": "encounter_4",
+        "level": 11,
+        "enemies": [
+          {
+            "id": "U1-25",
+            "level": 11
+          },
+          {
+            "id": "G3-22",
+            "level": 11
+          },
+          {
+            "id": "G3-23",
+            "level": 11
+          }
+        ]
+      },
+      {
+        "id": "encounter_5",
+        "level": 12,
+        "enemies": [
+          {
+            "id": "U1-28",
+            "level": 12
+          },
+          {
+            "id": "U5-02",
+            "level": 12
+          },
+          {
+            "id": "U5-04",
+            "level": 12
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 16,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "U5-17",
+            "level": 16
+          },
+          {
+            "id": "U5-05",
+            "level": 12
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_tokujouyakusou",
+        "count": 2
+      },
+      {
+        "itemId": "item_maryokunoshizuku",
+        "count": 2
+      },
+      {
+        "itemId": "item_mamorinotane",
+        "count": 1
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 180,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_tokujouyakusou",
+          "count": 2,
+          "weight": 4
+        },
+        {
+          "itemId": "item_maryokunoshizuku",
+          "count": 3,
+          "weight": 3
+        },
+        {
+          "itemId": "item_sekaijunoha",
+          "count": 1,
+          "weight": 3
+        },
+        {
+          "itemId": "item_bannouyaku",
+          "count": 2,
+          "weight": 2
+        },
+        {
+          "itemId": "item_koukyuuniku",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_subayasanotane",
+          "count": 1,
+          "weight": 1
+        },
+        {
+          "itemId": "item_kashikosanotane",
+          "count": 1,
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_08",
+    "name": "灼熱の火口道",
+    "description": "溶けた岩が川になって流れる火口の道。熱気だけで息が上がり、立っているだけで体力がけずられる。",
+    "background": "lava_cavern",
+    "recommendedLevel": 19,
+    "partySizeHint": 3,
+    "locked": true,
+    "floors": 3,
+    "encounterSteps": 14,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 10,
+        "enemies": [
+          {
+            "id": "U1-02",
+            "level": 10
+          },
+          {
+            "id": "U5-03",
+            "level": 10
+          },
+          {
+            "id": "U5-10",
+            "level": 10
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 11,
+        "enemies": [
+          {
+            "id": "U1-04",
+            "level": 11
+          },
+          {
+            "id": "U5-19",
+            "level": 11
+          },
+          {
+            "id": "U6-04",
+            "level": 11
+          }
+        ]
+      },
+      {
+        "id": "encounter_3",
+        "level": 12,
+        "enemies": [
+          {
+            "id": "U1-08",
+            "level": 12
+          },
+          {
+            "id": "U6-11",
+            "level": 12
+          },
+          {
+            "id": "U6-13",
+            "level": 12
+          }
+        ]
+      },
+      {
+        "id": "encounter_4",
+        "level": 14,
+        "enemies": [
+          {
+            "id": "U1-14",
+            "level": 14
+          },
+          {
+            "id": "U6-16",
+            "level": 14
+          },
+          {
+            "id": "G3-06",
+            "level": 14
+          }
+        ]
+      },
+      {
+        "id": "encounter_5",
+        "level": 15,
+        "enemies": [
+          {
+            "id": "U1-17",
+            "level": 15
+          },
+          {
+            "id": "G3-07",
+            "level": 15
+          },
+          {
+            "id": "G3-08",
+            "level": 15
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 21,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "U4-13",
+            "level": 21
+          },
+          {
+            "id": "G3-09",
+            "level": 15
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_tokujouyakusou",
+        "count": 2
+      },
+      {
+        "itemId": "item_koukyuuniku",
+        "count": 1
+      },
+      {
+        "itemId": "item_subayasanotane",
+        "count": 1
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 225,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_tokujouyakusou",
+          "count": 2,
+          "weight": 4
+        },
+        {
+          "itemId": "item_maryokunoshizuku",
+          "count": 3,
+          "weight": 3
+        },
+        {
+          "itemId": "item_sekaijunoha",
+          "count": 1,
+          "weight": 3
+        },
+        {
+          "itemId": "item_bannouyaku",
+          "count": 2,
+          "weight": 2
+        },
+        {
+          "itemId": "item_koukyuuniku",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_subayasanotane",
+          "count": 1,
+          "weight": 1
+        },
+        {
+          "itemId": "item_kashikosanotane",
+          "count": 1,
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_09",
+    "name": "凍てつく尖塔",
+    "description": "氷が氷を積み上げてできた塔。頂に近づくほど寒さが牙になり、はいた息が白いうちに凍りつく。",
+    "background": "snow_mountain",
+    "recommendedLevel": 24,
+    "partySizeHint": 3,
+    "locked": true,
+    "floors": 3,
+    "encounterSteps": 14,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 12,
+        "enemies": [
+          {
+            "id": "U2-04",
+            "level": 12
+          },
+          {
+            "id": "U5-26",
+            "level": 12
+          },
+          {
+            "id": "G4-06",
+            "level": 12
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 14,
+        "enemies": [
+          {
+            "id": "U2-23",
+            "level": 14
+          },
+          {
+            "id": "G3-10",
+            "level": 14
+          },
+          {
+            "id": "G4-08",
+            "level": 14
+          }
+        ]
+      },
+      {
+        "id": "encounter_3",
+        "level": 16,
+        "enemies": [
+          {
+            "id": "U3-14",
+            "level": 16
+          },
+          {
+            "id": "G3-11",
+            "level": 16
+          },
+          {
+            "id": "G4-19",
+            "level": 16
+          }
+        ]
+      },
+      {
+        "id": "encounter_4",
+        "level": 17,
+        "enemies": [
+          {
+            "id": "U3-24",
+            "level": 17
+          },
+          {
+            "id": "G3-13",
+            "level": 17
+          },
+          {
+            "id": "G4-24",
+            "level": 17
+          }
+        ]
+      },
+      {
+        "id": "encounter_5",
+        "level": 19,
+        "enemies": [
+          {
+            "id": "G1-26",
+            "level": 19
+          },
+          {
+            "id": "G3-14",
+            "level": 19
+          },
+          {
+            "id": "U4-05",
+            "level": 19
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 26,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "G4-06",
+            "level": 26
+          },
+          {
+            "id": "G4-01",
+            "level": 19
+          },
+          {
+            "id": "G4-02",
+            "level": 19
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_tokujouyakusou",
+        "count": 3
+      },
+      {
+        "itemId": "item_sekaijunoha",
+        "count": 2
+      },
+      {
+        "itemId": "item_kashikosanotane",
+        "count": 1
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 280,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_tokujouyakusou",
+          "count": 3,
+          "weight": 4
+        },
+        {
+          "itemId": "item_sekaijunoha",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_koukyuuniku",
+          "count": 2,
+          "weight": 2
+        },
+        {
+          "itemId": "item_ikazuchinotsue",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_inochinokinomi",
+          "count": 1,
+          "weight": 1
+        },
+        {
+          "itemId": "item_fushiginakinomi",
+          "count": 1,
+          "weight": 1
+        },
+        {
+          "itemId": "item_sekaijunoshizuku",
+          "count": 1,
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_10",
+    "name": "星辰の大回廊",
+    "description": "天井に星図がきざまれた、終わりの見えない回廊。ここでは時の流れがわずかにねじれている。",
+    "background": "ancient_ruins",
+    "recommendedLevel": 30,
+    "partySizeHint": 3,
+    "locked": true,
+    "floors": 3,
+    "encounterSteps": 14,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 15,
+        "enemies": [
+          {
+            "id": "U5-16",
+            "level": 15
+          },
+          {
+            "id": "U5-21",
+            "level": 15
+          },
+          {
+            "id": "G4-13",
+            "level": 15
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 17,
+        "enemies": [
+          {
+            "id": "U5-28",
+            "level": 17
+          },
+          {
+            "id": "G3-17",
+            "level": 17
+          },
+          {
+            "id": "G4-18",
+            "level": 17
+          }
+        ]
+      },
+      {
+        "id": "encounter_3",
+        "level": 20,
+        "enemies": [
+          {
+            "id": "G3-18",
+            "level": 20
+          },
+          {
+            "id": "G3-20",
+            "level": 20
+          },
+          {
+            "id": "G4-21",
+            "level": 20
+          }
+        ]
+      },
+      {
+        "id": "encounter_4",
+        "level": 22,
+        "enemies": [
+          {
+            "id": "G3-21",
+            "level": 22
+          },
+          {
+            "id": "G3-24",
+            "level": 22
+          },
+          {
+            "id": "G4-26",
+            "level": 22
+          }
+        ]
+      },
+      {
+        "id": "encounter_5",
+        "level": 24,
+        "enemies": [
+          {
+            "id": "G3-25",
+            "level": 24
+          },
+          {
+            "id": "G3-27",
+            "level": 24
+          },
+          {
+            "id": "U4-10",
+            "level": 24
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 33,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "U4-19",
+            "level": 33
+          },
+          {
+            "id": "U4-16",
+            "level": 24
+          },
+          {
+            "id": "U4-21",
+            "level": 24
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_tokujouyakusou",
+        "count": 3
+      },
+      {
+        "itemId": "item_sekaijunoshizuku",
+        "count": 1
+      },
+      {
+        "itemId": "item_inochinokinomi",
+        "count": 1
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 345,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_tokujouyakusou",
+          "count": 3,
+          "weight": 4
+        },
+        {
+          "itemId": "item_sekaijunoha",
+          "count": 2,
+          "weight": 3
+        },
+        {
+          "itemId": "item_koukyuuniku",
+          "count": 2,
+          "weight": 2
+        },
+        {
+          "itemId": "item_ikazuchinotsue",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_inochinokinomi",
+          "count": 1,
+          "weight": 1
+        },
+        {
+          "itemId": "item_fushiginakinomi",
+          "count": 1,
+          "weight": 1
+        },
+        {
+          "itemId": "item_sekaijunoshizuku",
+          "count": 1,
+          "weight": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_11",
+    "name": "溶岩竜の巣",
+    "description": "火口のさらに底、竜が卵を抱くための熱だまり。近づくものは灰になるという。",
+    "background": "lava_cavern",
+    "recommendedLevel": 38,
+    "partySizeHint": 3,
+    "locked": true,
+    "floors": 3,
+    "encounterSteps": 14,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 19,
+        "enemies": [
+          {
+            "id": "G3-29",
+            "level": 19
+          },
+          {
+            "id": "U5-08",
+            "level": 19
+          },
+          {
+            "id": "G4-05",
+            "level": 19
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 22,
+        "enemies": [
+          {
+            "id": "U5-09",
+            "level": 22
+          },
+          {
+            "id": "U5-12",
+            "level": 22
+          },
+          {
+            "id": "U4-06",
+            "level": 22
+          }
+        ]
+      },
+      {
+        "id": "encounter_3",
+        "level": 25,
+        "enemies": [
+          {
+            "id": "U5-27",
+            "level": 25
+          },
+          {
+            "id": "U6-15",
+            "level": 25
+          },
+          {
+            "id": "U4-17",
+            "level": 25
+          }
+        ]
+      },
+      {
+        "id": "encounter_4",
+        "level": 28,
+        "enemies": [
+          {
+            "id": "G3-19",
+            "level": 28
+          },
+          {
+            "id": "G3-28",
+            "level": 28
+          },
+          {
+            "id": "U4-22",
+            "level": 28
+          }
+        ]
+      },
+      {
+        "id": "encounter_5",
+        "level": 30,
+        "enemies": [
+          {
+            "id": "U5-14",
+            "level": 30
+          },
+          {
+            "id": "U5-22",
+            "level": 30
+          },
+          {
+            "id": "U4-23",
+            "level": 30
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 34,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "G5-05",
+            "level": 34
+          },
+          {
+            "id": "U4-30",
+            "level": 30
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_sekaijunoshizuku",
+        "count": 1
+      },
+      {
+        "itemId": "item_sekaijunoha",
+        "count": 2
+      },
+      {
+        "itemId": "item_saikoukyuuniku",
+        "count": 1
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 430,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_tokujouyakusou",
+          "count": 3,
+          "weight": 3
+        },
+        {
+          "itemId": "item_sekaijunoha",
+          "count": 3,
+          "weight": 3
+        },
+        {
+          "itemId": "item_sekaijunoshizuku",
+          "count": 1,
+          "weight": 3
+        },
+        {
+          "itemId": "item_saikoukyuuniku",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_ikazuchinotsue",
+          "count": 2,
+          "weight": 2
+        },
+        {
+          "itemId": "item_inochinokinomi",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_fushiginakinomi",
+          "count": 1,
+          "weight": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "dungeon_12",
+    "name": "天穹の玉座",
+    "description": "雲を抜けた先に浮かぶ、最果ての玉座。ここを踏破した者だけが、この世界のいただきを知る。",
+    "background": "ancient_ruins",
+    "recommendedLevel": 46,
+    "partySizeHint": 3,
+    "locked": true,
+    "floors": 3,
+    "encounterSteps": 14,
+    "encounters": [
+      {
+        "id": "encounter_1",
+        "level": 23,
+        "enemies": [
+          {
+            "id": "U5-25",
+            "level": 23
+          },
+          {
+            "id": "G4-12",
+            "level": 23
+          },
+          {
+            "id": "G4-28",
+            "level": 23
+          }
+        ]
+      },
+      {
+        "id": "encounter_2",
+        "level": 27,
+        "enemies": [
+          {
+            "id": "U6-06",
+            "level": 27
+          },
+          {
+            "id": "G4-30",
+            "level": 27
+          },
+          {
+            "id": "U4-02",
+            "level": 27
+          }
+        ]
+      },
+      {
+        "id": "encounter_3",
+        "level": 30,
+        "enemies": [
+          {
+            "id": "U5-23",
+            "level": 30
+          },
+          {
+            "id": "U4-03",
+            "level": 30
+          },
+          {
+            "id": "U4-12",
+            "level": 30
+          }
+        ]
+      },
+      {
+        "id": "encounter_4",
+        "level": 34,
+        "enemies": [
+          {
+            "id": "U5-11",
+            "level": 34
+          },
+          {
+            "id": "U4-20",
+            "level": 34
+          },
+          {
+            "id": "U4-26",
+            "level": 34
+          }
+        ]
+      },
+      {
+        "id": "encounter_5",
+        "level": 38,
+        "enemies": [
+          {
+            "id": "U5-11",
+            "level": 38
+          },
+          {
+            "id": "G4-03",
+            "level": 38
+          },
+          {
+            "id": "G4-04",
+            "level": 38
+          }
+        ]
+      },
+      {
+        "id": "encounter_boss",
+        "level": 44,
+        "isBoss": true,
+        "enemies": [
+          {
+            "id": "G5-07",
+            "level": 44
+          },
+          {
+            "id": "G4-07",
+            "level": 38
+          }
+        ]
+      }
+    ],
+    "clearReward": [
+      {
+        "itemId": "item_sekaijunoshizuku",
+        "count": 2
+      },
+      {
+        "itemId": "item_saikoukyuuniku",
+        "count": 2
+      },
+      {
+        "itemId": "item_fushiginakinomi",
+        "count": 1
+      }
+    ],
+    "chest": {
+      "mix": {
+        "empty": 0.18,
+        "gold": 0.34,
+        "item": 0.33,
+        "both": 0.15
+      },
+      "gold": {
+        "base": 520,
+        "perFloor": 0.35,
+        "spread": 0.3
+      },
+      "items": [
+        {
+          "itemId": "item_tokujouyakusou",
+          "count": 3,
+          "weight": 3
+        },
+        {
+          "itemId": "item_sekaijunoha",
+          "count": 3,
+          "weight": 3
+        },
+        {
+          "itemId": "item_sekaijunoshizuku",
+          "count": 1,
+          "weight": 3
+        },
+        {
+          "itemId": "item_saikoukyuuniku",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_ikazuchinotsue",
+          "count": 2,
+          "weight": 2
+        },
+        {
+          "itemId": "item_inochinokinomi",
+          "count": 1,
+          "weight": 2
+        },
+        {
+          "itemId": "item_fushiginakinomi",
+          "count": 1,
+          "weight": 2
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>モンスター育成ゲーム (プロトタイプ)</title>
+
+    <!-- 書体。ドット絵に合わせて2本立てにしてある (src/index.css の --font-* を参照)。
+         DotGothic16         … 見出し・ウィンドウの題・チップ。日本語のビットマップ体で、
+                               16px以上でくっきり出る。本文には使わない(小さいと読みにくい)。
+         Zen Kaku Gothic New … 本文・メニュー・ボタン。ふところが広く、小さくても
+                               かなが つぶれない。家庭用RPGのメッセージ体に近い。
+         読み込めなかったときのために、Windows/Mac/Android の
+         標準の日本語ゴシックを実体で並べてある。 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

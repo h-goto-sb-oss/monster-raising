@@ -1,0 +1,421 @@
+/* battleUI.css
+ * 戦闘画面のオーバーレイUI。
+ *
+ * 方針:
+ *  - 戦闘画面は「キャンバスが画面全部 + UIはその上に重なる」。
+ *    UIをキャンバスの下に積まないので、縦の高さが足りなくなることがない。
+ *  - サイズはすべて vh/vw の clamp() で決める。戦闘のルート要素は
+ *    ビューポートちょうどなので、vh = 画面の高さとして正しく効く。
+ *    スマホ横(高さ390px)から1280x720まで、同じ見た目のまま縮む。
+ *  - 枠と文字は index.css のトークン(--fs-* / .jrpg-win / .jrpg-btn)を使う。
+ *
+ * v3 のレイアウト変更 (なかまのモンスターが隠れる問題):
+ *   旧版は 左下に「ログ + なかまの帯」を積み、右下にコマンドを置いていた。
+ *   左下の塊が高さ150px近くあり、なかまのモンスターの足元から腹までを
+ *   隠していた(スマホ横だと画面の4割)。
+ *   新版は **ログを画面の上へ移した**。
+ *     上  … 見出しチップ / 戦闘ログ / 対象えらびの案内
+ *     中  … てき(上段)と なかま(下段)。ここには何も重ねない
+ *     下  … 左になかまの状態帯、右にコマンド
+ *   下に残るのは「なかまの状態帯」1枚だけなので、モンスターの立ち位置を
+ *   その真上まで上げられる。実際の帯の高さと、コマンド欄の幅は
+ *   BattleScreen.jsx が実測して BattleScene に渡すので、
+ *   文字の大きさを変えても隠れ方が変わらない。
+ */
+
+/* 戦闘中はページ自体をスクロールさせない(1画面に収める) */
+html.mrg-battle-lock,
+html.mrg-battle-lock body {
+  overflow: hidden;
+  height: 100%;
+}
+
+.mrg-battle {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+.mrg-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.mrg-canvas canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+
+/* --- 上部: 見出しチップ ------------------------------------------------ */
+
+.mrg-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: clamp(4px, 1vh, 9px) clamp(6px, 1.4vw, 14px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.mrg-chip {
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  line-height: 1.25;
+  padding: clamp(2px, 0.5vh, 5px) clamp(6px, 1vw, 12px);
+  border-radius: 3px;
+  background: rgba(8, 11, 22, 0.78);
+  border: 1px solid var(--gold-dim);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.75);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+}
+
+.mrg-chip--turn {
+  color: var(--ink-gold);
+}
+
+/* --- 上部: 戦闘ログ + 対象えらびの案内 ---------------------------------
+ *
+ * ログを上へ置いたのは、下に置くと なかまのモンスターに かぶるから
+ * (このファイル冒頭の v3 メモ)。てきの列より上なので、絵にも重ならない。
+ */
+
+.mrg-topleft {
+  position: absolute;
+  /* 見出しチップのすぐ下。チップの高さぶんだけ空ける。 */
+  top: clamp(30px, 6.6vh, 52px);
+  left: clamp(5px, 1.2vw, 14px);
+  width: min(62%, 640px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(3px, 0.7vh, 6px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/*
+ * ログの高さは「行の高さ x 行数 + 余白 + 枠」でぴったり出す。
+ *
+ * ここが clamp() の効いた max-height だったせいで、いちばん上の行が
+ * 半分だけ欠けて見えていた。最新行を見せるために毎回いちばん下まで
+ * スクロールしており、見えている高さが行の高さの整数倍でないと、
+ * 上端はかならず行の途中で切れる。
+ * 高さを行数から逆算すれば、スクロール位置がどこでも行が欠けない。
+ */
+.mrg-log {
+  --log-lines: 3;
+  --log-line-height: 1.5;
+  --log-pad-y: clamp(5px, 1.1vh, 9px);
+  width: 100%;
+  pointer-events: auto;
+  padding: var(--log-pad-y) clamp(7px, 1.1vw, 13px);
+  font-size: var(--fs-sm);
+  line-height: var(--log-line-height);
+  height: calc(
+    var(--log-lines) * var(--log-line-height) * 1em  /* 本文 */
+    + var(--log-pad-y) * 2                            /* 上下の余白 */
+    + 4px                                             /* 枠の2px x 2 */
+  );
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+}
+
+.mrg-log > div {
+  /* 1件が2行に折り返しても行の高さは同じ = 上端が欠けない。 */
+  line-height: var(--log-line-height);
+}
+
+/* 対象選択中の案内。ログのすぐ下に出す(ログの位置は動かさない)。 */
+.mrg-prompt {
+  max-width: 100%;
+  padding: clamp(2px, 0.6vh, 6px) clamp(9px, 1.6vw, 18px);
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  color: var(--ink-gold);
+  background: rgba(8, 11, 22, 0.86);
+  border: 1px solid rgba(255, 217, 122, 0.75);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8);
+  border-radius: 3px;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  animation: mrg-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes mrg-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.62; }
+}
+
+/* --- 左下: なかまの状態帯 ---------------------------------------------
+ * 画面の下に残す唯一の板。この高さのぶんだけ モンスターの立ち位置が上がる。
+ */
+
+.mrg-partywrap {
+  position: absolute;
+  left: clamp(5px, 1.2vw, 14px);
+  bottom: clamp(4px, 1vh, 12px);
+  width: min(66%, 680px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.mrg-party {
+  pointer-events: auto;
+  padding: clamp(3px, 0.7vh, 6px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2px, 0.4vh, 4px);
+}
+
+.mrg-prow {
+  display: flex;
+  align-items: center;
+  gap: clamp(4px, 0.7vw, 9px);
+  padding: 0 clamp(4px, 0.6vw, 8px);
+  border-radius: 2px;
+  border: 1px solid transparent;
+  height: clamp(20px, 3.9vh, 30px);
+  font-size: var(--fs-xs);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9);
+}
+
+.mrg-prow--active {
+  border-color: rgba(255, 217, 122, 0.9);
+  background: rgba(255, 217, 122, 0.14);
+}
+
+.mrg-prow--targetable {
+  border-color: rgba(255, 217, 122, 0.9);
+  background: rgba(255, 217, 122, 0.22);
+  cursor: pointer;
+}
+
+.mrg-prow--down {
+  opacity: 0.5;
+}
+
+.mrg-prow img {
+  width: clamp(17px, 3.3vh, 26px);
+  height: clamp(17px, 3.3vh, 26px);
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+.mrg-pname {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 7em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.mrg-plv {
+  font-family: var(--font-display);
+  color: var(--ink-gold);
+  flex-shrink: 0;
+}
+
+.mrg-pgauge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.mrg-pgauge > span {
+  font-family: var(--font-display);
+  font-size: 0.9em;
+  color: var(--ink-dim);
+  flex-shrink: 0;
+}
+
+.mrg-bar {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 18px;
+  height: clamp(6px, 1.2vh, 10px);
+  background: rgba(4, 6, 12, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.mrg-bar > i {
+  display: block;
+  height: 100%;
+  transition: width 0.22s ease;
+}
+
+.mrg-pnum {
+  font-size: 0.9em;
+  color: #d7dcea;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.mrg-tags {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.mrg-tag {
+  font-size: clamp(9px, 1.8vh, 12px);
+  line-height: 1.3;
+  border-radius: 2px;
+  padding: 0 4px;
+  font-weight: 700;
+  text-shadow: none;
+}
+
+/* --- 右下: コマンド ---------------------------------------------------- */
+
+.mrg-cmd {
+  position: absolute;
+  right: clamp(5px, 1.2vw, 14px);
+  bottom: clamp(4px, 1vh, 12px);
+  width: clamp(196px, 32vw, 320px);
+  max-height: calc(100% - clamp(34px, 7.5vh, 62px));
+  display: flex;
+  flex-direction: column;
+  padding: clamp(5px, 1.1vh, 11px) clamp(6px, 1vw, 12px);
+  overflow: hidden;
+  z-index: 4;
+}
+
+.mrg-cmd-body {
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.mrg-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(3px, 0.8vh, 7px);
+}
+
+.mrg-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3px, 0.6vh, 5px);
+}
+
+.mrg-btn--back {
+  margin-top: clamp(4px, 0.8vh, 7px);
+}
+
+.mrg-hint {
+  font-size: var(--fs-sm);
+  color: var(--ink-gold);
+  line-height: 1.45;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9);
+}
+
+.mrg-note {
+  font-size: var(--fs-xs);
+  color: var(--ink-dim);
+  line-height: 1.45;
+}
+
+/* リスト(とくぎ/どうぐ)は枠の中だけでスクロールさせる */
+.mrg-list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3px, 0.55vh, 5px);
+  max-height: clamp(104px, 32vh, 250px);
+  overflow-y: auto;
+  padding-right: 3px;
+}
+
+.mrg-listhead {
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  color: var(--ink-dim);
+  margin: 3px 0 2px;
+}
+
+.mrg-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.mrg-grow {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.mrg-count {
+  color: #c4ccdd;
+  flex-shrink: 0;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+/* --- 中央: 決着パネル -------------------------------------------------- */
+
+.mrg-result-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 6, 12, 0.62);
+  padding: clamp(6px, 2vh, 20px);
+  z-index: 6;
+}
+
+.mrg-result {
+  width: min(560px, 88vw);
+  max-height: 94%;
+  overflow-y: auto;
+  padding: clamp(8px, 2vh, 22px) clamp(10px, 2vw, 26px);
+  text-align: center;
+}
+
+.mrg-result h2 {
+  margin: 0 0 clamp(5px, 1.2vh, 12px);
+  font-family: var(--font-display);
+  font-weight: normal;
+  font-size: var(--fs-xl);
+  color: var(--ink-gold);
+  letter-spacing: 0.08em;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.85);
+}
+
+.mrg-result-log {
+  text-align: left;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  max-height: clamp(76px, 34vh, 240px);
+  overflow-y: auto;
+  background: rgba(6, 8, 16, 0.72);
+  border: 1px solid var(--gold-dim);
+  border-radius: 3px;
+  padding: clamp(5px, 1.2vh, 12px);
+  margin-bottom: clamp(7px, 1.6vh, 16px);
+}

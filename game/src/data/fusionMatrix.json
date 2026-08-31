@@ -1,0 +1,802 @@
+[
+  {
+    "bloodline_type": "スライム",
+    "partner_type": "スライム",
+    "result_primary_type": "スライム",
+    "partner_influence": "柔軟、分裂、吸収",
+    "visual_rule": "粘体・滴・弾力を主身体に保ち、粘体・滴・弾力を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "スライム",
+    "partner_type": "ドラゴン",
+    "result_primary_type": "スライム",
+    "partner_influence": "鱗、息、威圧",
+    "visual_rule": "粘体・滴・弾力を主身体に保ち、鱗・角・尾・ブレス器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "スライム",
+    "partner_type": "けもの",
+    "result_primary_type": "スライム",
+    "partner_influence": "本能、嗅覚、突進",
+    "visual_rule": "粘体・滴・弾力を主身体に保ち、毛皮・牙・四肢を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "スライム",
+    "partner_type": "鳥翼",
+    "result_primary_type": "スライム",
+    "partner_influence": "飛行、風、歌声",
+    "visual_rule": "粘体・滴・弾力を主身体に保ち、翼・羽毛・くちばしを20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "スライム",
+    "partner_type": "自然",
+    "result_primary_type": "スライム",
+    "partner_influence": "再生、胞子、根",
+    "visual_rule": "粘体・滴・弾力を主身体に保ち、葉・菌糸・樹皮・花を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "スライム",
+    "partner_type": "むし",
+    "result_primary_type": "スライム",
+    "partner_influence": "毒、糸、群れ",
+    "visual_rule": "粘体・滴・弾力を主身体に保ち、外骨格・複眼・節足を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "スライム",
+    "partner_type": "水棲",
+    "result_primary_type": "スライム",
+    "partner_influence": "水中適応、泡、潮",
+    "visual_rule": "粘体・滴・弾力を主身体に保ち、ひれ・えら・殻・触手を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "スライム",
+    "partner_type": "物質",
+    "result_primary_type": "スライム",
+    "partner_influence": "装甲、機構、無機質化",
+    "visual_rule": "粘体・滴・弾力を主身体に保ち、鉱石・道具・機械・建築を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "スライム",
+    "partner_type": "不死",
+    "result_primary_type": "スライム",
+    "partner_influence": "呪い、吸収、夜行",
+    "visual_rule": "粘体・滴・弾力を主身体に保ち、骨・霊火・影・包帯を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "スライム",
+    "partner_type": "幻魔",
+    "result_primary_type": "スライム",
+    "partner_influence": "魔法、幻惑、儀式",
+    "visual_rule": "粘体・滴・弾力を主身体に保ち、魔力体・人型・異界器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "ドラゴン",
+    "partner_type": "スライム",
+    "result_primary_type": "ドラゴン",
+    "partner_influence": "柔軟、分裂、吸収",
+    "visual_rule": "鱗・角・尾・ブレス器官を主身体に保ち、粘体・滴・弾力を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "ドラゴン",
+    "partner_type": "ドラゴン",
+    "result_primary_type": "ドラゴン",
+    "partner_influence": "鱗、息、威圧",
+    "visual_rule": "鱗・角・尾・ブレス器官を主身体に保ち、鱗・角・尾・ブレス器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "ドラゴン",
+    "partner_type": "けもの",
+    "result_primary_type": "ドラゴン",
+    "partner_influence": "本能、嗅覚、突進",
+    "visual_rule": "鱗・角・尾・ブレス器官を主身体に保ち、毛皮・牙・四肢を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "ドラゴン",
+    "partner_type": "鳥翼",
+    "result_primary_type": "ドラゴン",
+    "partner_influence": "飛行、風、歌声",
+    "visual_rule": "鱗・角・尾・ブレス器官を主身体に保ち、翼・羽毛・くちばしを20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "ドラゴン",
+    "partner_type": "自然",
+    "result_primary_type": "ドラゴン",
+    "partner_influence": "再生、胞子、根",
+    "visual_rule": "鱗・角・尾・ブレス器官を主身体に保ち、葉・菌糸・樹皮・花を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "ドラゴン",
+    "partner_type": "むし",
+    "result_primary_type": "ドラゴン",
+    "partner_influence": "毒、糸、群れ",
+    "visual_rule": "鱗・角・尾・ブレス器官を主身体に保ち、外骨格・複眼・節足を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "ドラゴン",
+    "partner_type": "水棲",
+    "result_primary_type": "ドラゴン",
+    "partner_influence": "水中適応、泡、潮",
+    "visual_rule": "鱗・角・尾・ブレス器官を主身体に保ち、ひれ・えら・殻・触手を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "ドラゴン",
+    "partner_type": "物質",
+    "result_primary_type": "ドラゴン",
+    "partner_influence": "装甲、機構、無機質化",
+    "visual_rule": "鱗・角・尾・ブレス器官を主身体に保ち、鉱石・道具・機械・建築を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "ドラゴン",
+    "partner_type": "不死",
+    "result_primary_type": "ドラゴン",
+    "partner_influence": "呪い、吸収、夜行",
+    "visual_rule": "鱗・角・尾・ブレス器官を主身体に保ち、骨・霊火・影・包帯を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "ドラゴン",
+    "partner_type": "幻魔",
+    "result_primary_type": "ドラゴン",
+    "partner_influence": "魔法、幻惑、儀式",
+    "visual_rule": "鱗・角・尾・ブレス器官を主身体に保ち、魔力体・人型・異界器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "けもの",
+    "partner_type": "スライム",
+    "result_primary_type": "けもの",
+    "partner_influence": "柔軟、分裂、吸収",
+    "visual_rule": "毛皮・牙・四肢を主身体に保ち、粘体・滴・弾力を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "けもの",
+    "partner_type": "ドラゴン",
+    "result_primary_type": "けもの",
+    "partner_influence": "鱗、息、威圧",
+    "visual_rule": "毛皮・牙・四肢を主身体に保ち、鱗・角・尾・ブレス器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "けもの",
+    "partner_type": "けもの",
+    "result_primary_type": "けもの",
+    "partner_influence": "本能、嗅覚、突進",
+    "visual_rule": "毛皮・牙・四肢を主身体に保ち、毛皮・牙・四肢を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "けもの",
+    "partner_type": "鳥翼",
+    "result_primary_type": "けもの",
+    "partner_influence": "飛行、風、歌声",
+    "visual_rule": "毛皮・牙・四肢を主身体に保ち、翼・羽毛・くちばしを20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "けもの",
+    "partner_type": "自然",
+    "result_primary_type": "けもの",
+    "partner_influence": "再生、胞子、根",
+    "visual_rule": "毛皮・牙・四肢を主身体に保ち、葉・菌糸・樹皮・花を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "けもの",
+    "partner_type": "むし",
+    "result_primary_type": "けもの",
+    "partner_influence": "毒、糸、群れ",
+    "visual_rule": "毛皮・牙・四肢を主身体に保ち、外骨格・複眼・節足を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "けもの",
+    "partner_type": "水棲",
+    "result_primary_type": "けもの",
+    "partner_influence": "水中適応、泡、潮",
+    "visual_rule": "毛皮・牙・四肢を主身体に保ち、ひれ・えら・殻・触手を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "けもの",
+    "partner_type": "物質",
+    "result_primary_type": "けもの",
+    "partner_influence": "装甲、機構、無機質化",
+    "visual_rule": "毛皮・牙・四肢を主身体に保ち、鉱石・道具・機械・建築を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "けもの",
+    "partner_type": "不死",
+    "result_primary_type": "けもの",
+    "partner_influence": "呪い、吸収、夜行",
+    "visual_rule": "毛皮・牙・四肢を主身体に保ち、骨・霊火・影・包帯を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "けもの",
+    "partner_type": "幻魔",
+    "result_primary_type": "けもの",
+    "partner_influence": "魔法、幻惑、儀式",
+    "visual_rule": "毛皮・牙・四肢を主身体に保ち、魔力体・人型・異界器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "鳥翼",
+    "partner_type": "スライム",
+    "result_primary_type": "鳥翼",
+    "partner_influence": "柔軟、分裂、吸収",
+    "visual_rule": "翼・羽毛・くちばしを主身体に保ち、粘体・滴・弾力を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "鳥翼",
+    "partner_type": "ドラゴン",
+    "result_primary_type": "鳥翼",
+    "partner_influence": "鱗、息、威圧",
+    "visual_rule": "翼・羽毛・くちばしを主身体に保ち、鱗・角・尾・ブレス器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "鳥翼",
+    "partner_type": "けもの",
+    "result_primary_type": "鳥翼",
+    "partner_influence": "本能、嗅覚、突進",
+    "visual_rule": "翼・羽毛・くちばしを主身体に保ち、毛皮・牙・四肢を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "鳥翼",
+    "partner_type": "鳥翼",
+    "result_primary_type": "鳥翼",
+    "partner_influence": "飛行、風、歌声",
+    "visual_rule": "翼・羽毛・くちばしを主身体に保ち、翼・羽毛・くちばしを20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "鳥翼",
+    "partner_type": "自然",
+    "result_primary_type": "鳥翼",
+    "partner_influence": "再生、胞子、根",
+    "visual_rule": "翼・羽毛・くちばしを主身体に保ち、葉・菌糸・樹皮・花を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "鳥翼",
+    "partner_type": "むし",
+    "result_primary_type": "鳥翼",
+    "partner_influence": "毒、糸、群れ",
+    "visual_rule": "翼・羽毛・くちばしを主身体に保ち、外骨格・複眼・節足を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "鳥翼",
+    "partner_type": "水棲",
+    "result_primary_type": "鳥翼",
+    "partner_influence": "水中適応、泡、潮",
+    "visual_rule": "翼・羽毛・くちばしを主身体に保ち、ひれ・えら・殻・触手を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "鳥翼",
+    "partner_type": "物質",
+    "result_primary_type": "鳥翼",
+    "partner_influence": "装甲、機構、無機質化",
+    "visual_rule": "翼・羽毛・くちばしを主身体に保ち、鉱石・道具・機械・建築を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "鳥翼",
+    "partner_type": "不死",
+    "result_primary_type": "鳥翼",
+    "partner_influence": "呪い、吸収、夜行",
+    "visual_rule": "翼・羽毛・くちばしを主身体に保ち、骨・霊火・影・包帯を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "鳥翼",
+    "partner_type": "幻魔",
+    "result_primary_type": "鳥翼",
+    "partner_influence": "魔法、幻惑、儀式",
+    "visual_rule": "翼・羽毛・くちばしを主身体に保ち、魔力体・人型・異界器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "自然",
+    "partner_type": "スライム",
+    "result_primary_type": "自然",
+    "partner_influence": "柔軟、分裂、吸収",
+    "visual_rule": "葉・菌糸・樹皮・花を主身体に保ち、粘体・滴・弾力を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "自然",
+    "partner_type": "ドラゴン",
+    "result_primary_type": "自然",
+    "partner_influence": "鱗、息、威圧",
+    "visual_rule": "葉・菌糸・樹皮・花を主身体に保ち、鱗・角・尾・ブレス器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "自然",
+    "partner_type": "けもの",
+    "result_primary_type": "自然",
+    "partner_influence": "本能、嗅覚、突進",
+    "visual_rule": "葉・菌糸・樹皮・花を主身体に保ち、毛皮・牙・四肢を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "自然",
+    "partner_type": "鳥翼",
+    "result_primary_type": "自然",
+    "partner_influence": "飛行、風、歌声",
+    "visual_rule": "葉・菌糸・樹皮・花を主身体に保ち、翼・羽毛・くちばしを20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "自然",
+    "partner_type": "自然",
+    "result_primary_type": "自然",
+    "partner_influence": "再生、胞子、根",
+    "visual_rule": "葉・菌糸・樹皮・花を主身体に保ち、葉・菌糸・樹皮・花を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "自然",
+    "partner_type": "むし",
+    "result_primary_type": "自然",
+    "partner_influence": "毒、糸、群れ",
+    "visual_rule": "葉・菌糸・樹皮・花を主身体に保ち、外骨格・複眼・節足を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "自然",
+    "partner_type": "水棲",
+    "result_primary_type": "自然",
+    "partner_influence": "水中適応、泡、潮",
+    "visual_rule": "葉・菌糸・樹皮・花を主身体に保ち、ひれ・えら・殻・触手を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "自然",
+    "partner_type": "物質",
+    "result_primary_type": "自然",
+    "partner_influence": "装甲、機構、無機質化",
+    "visual_rule": "葉・菌糸・樹皮・花を主身体に保ち、鉱石・道具・機械・建築を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "自然",
+    "partner_type": "不死",
+    "result_primary_type": "自然",
+    "partner_influence": "呪い、吸収、夜行",
+    "visual_rule": "葉・菌糸・樹皮・花を主身体に保ち、骨・霊火・影・包帯を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "自然",
+    "partner_type": "幻魔",
+    "result_primary_type": "自然",
+    "partner_influence": "魔法、幻惑、儀式",
+    "visual_rule": "葉・菌糸・樹皮・花を主身体に保ち、魔力体・人型・異界器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "むし",
+    "partner_type": "スライム",
+    "result_primary_type": "むし",
+    "partner_influence": "柔軟、分裂、吸収",
+    "visual_rule": "外骨格・複眼・節足を主身体に保ち、粘体・滴・弾力を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "むし",
+    "partner_type": "ドラゴン",
+    "result_primary_type": "むし",
+    "partner_influence": "鱗、息、威圧",
+    "visual_rule": "外骨格・複眼・節足を主身体に保ち、鱗・角・尾・ブレス器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "むし",
+    "partner_type": "けもの",
+    "result_primary_type": "むし",
+    "partner_influence": "本能、嗅覚、突進",
+    "visual_rule": "外骨格・複眼・節足を主身体に保ち、毛皮・牙・四肢を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "むし",
+    "partner_type": "鳥翼",
+    "result_primary_type": "むし",
+    "partner_influence": "飛行、風、歌声",
+    "visual_rule": "外骨格・複眼・節足を主身体に保ち、翼・羽毛・くちばしを20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "むし",
+    "partner_type": "自然",
+    "result_primary_type": "むし",
+    "partner_influence": "再生、胞子、根",
+    "visual_rule": "外骨格・複眼・節足を主身体に保ち、葉・菌糸・樹皮・花を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "むし",
+    "partner_type": "むし",
+    "result_primary_type": "むし",
+    "partner_influence": "毒、糸、群れ",
+    "visual_rule": "外骨格・複眼・節足を主身体に保ち、外骨格・複眼・節足を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "むし",
+    "partner_type": "水棲",
+    "result_primary_type": "むし",
+    "partner_influence": "水中適応、泡、潮",
+    "visual_rule": "外骨格・複眼・節足を主身体に保ち、ひれ・えら・殻・触手を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "むし",
+    "partner_type": "物質",
+    "result_primary_type": "むし",
+    "partner_influence": "装甲、機構、無機質化",
+    "visual_rule": "外骨格・複眼・節足を主身体に保ち、鉱石・道具・機械・建築を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "むし",
+    "partner_type": "不死",
+    "result_primary_type": "むし",
+    "partner_influence": "呪い、吸収、夜行",
+    "visual_rule": "外骨格・複眼・節足を主身体に保ち、骨・霊火・影・包帯を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "むし",
+    "partner_type": "幻魔",
+    "result_primary_type": "むし",
+    "partner_influence": "魔法、幻惑、儀式",
+    "visual_rule": "外骨格・複眼・節足を主身体に保ち、魔力体・人型・異界器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "水棲",
+    "partner_type": "スライム",
+    "result_primary_type": "水棲",
+    "partner_influence": "柔軟、分裂、吸収",
+    "visual_rule": "ひれ・えら・殻・触手を主身体に保ち、粘体・滴・弾力を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "水棲",
+    "partner_type": "ドラゴン",
+    "result_primary_type": "水棲",
+    "partner_influence": "鱗、息、威圧",
+    "visual_rule": "ひれ・えら・殻・触手を主身体に保ち、鱗・角・尾・ブレス器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "水棲",
+    "partner_type": "けもの",
+    "result_primary_type": "水棲",
+    "partner_influence": "本能、嗅覚、突進",
+    "visual_rule": "ひれ・えら・殻・触手を主身体に保ち、毛皮・牙・四肢を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "水棲",
+    "partner_type": "鳥翼",
+    "result_primary_type": "水棲",
+    "partner_influence": "飛行、風、歌声",
+    "visual_rule": "ひれ・えら・殻・触手を主身体に保ち、翼・羽毛・くちばしを20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "水棲",
+    "partner_type": "自然",
+    "result_primary_type": "水棲",
+    "partner_influence": "再生、胞子、根",
+    "visual_rule": "ひれ・えら・殻・触手を主身体に保ち、葉・菌糸・樹皮・花を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "水棲",
+    "partner_type": "むし",
+    "result_primary_type": "水棲",
+    "partner_influence": "毒、糸、群れ",
+    "visual_rule": "ひれ・えら・殻・触手を主身体に保ち、外骨格・複眼・節足を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "水棲",
+    "partner_type": "水棲",
+    "result_primary_type": "水棲",
+    "partner_influence": "水中適応、泡、潮",
+    "visual_rule": "ひれ・えら・殻・触手を主身体に保ち、ひれ・えら・殻・触手を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "水棲",
+    "partner_type": "物質",
+    "result_primary_type": "水棲",
+    "partner_influence": "装甲、機構、無機質化",
+    "visual_rule": "ひれ・えら・殻・触手を主身体に保ち、鉱石・道具・機械・建築を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "水棲",
+    "partner_type": "不死",
+    "result_primary_type": "水棲",
+    "partner_influence": "呪い、吸収、夜行",
+    "visual_rule": "ひれ・えら・殻・触手を主身体に保ち、骨・霊火・影・包帯を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "水棲",
+    "partner_type": "幻魔",
+    "result_primary_type": "水棲",
+    "partner_influence": "魔法、幻惑、儀式",
+    "visual_rule": "ひれ・えら・殻・触手を主身体に保ち、魔力体・人型・異界器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "物質",
+    "partner_type": "スライム",
+    "result_primary_type": "物質",
+    "partner_influence": "柔軟、分裂、吸収",
+    "visual_rule": "鉱石・道具・機械・建築を主身体に保ち、粘体・滴・弾力を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "物質",
+    "partner_type": "ドラゴン",
+    "result_primary_type": "物質",
+    "partner_influence": "鱗、息、威圧",
+    "visual_rule": "鉱石・道具・機械・建築を主身体に保ち、鱗・角・尾・ブレス器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "物質",
+    "partner_type": "けもの",
+    "result_primary_type": "物質",
+    "partner_influence": "本能、嗅覚、突進",
+    "visual_rule": "鉱石・道具・機械・建築を主身体に保ち、毛皮・牙・四肢を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "物質",
+    "partner_type": "鳥翼",
+    "result_primary_type": "物質",
+    "partner_influence": "飛行、風、歌声",
+    "visual_rule": "鉱石・道具・機械・建築を主身体に保ち、翼・羽毛・くちばしを20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "物質",
+    "partner_type": "自然",
+    "result_primary_type": "物質",
+    "partner_influence": "再生、胞子、根",
+    "visual_rule": "鉱石・道具・機械・建築を主身体に保ち、葉・菌糸・樹皮・花を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "物質",
+    "partner_type": "むし",
+    "result_primary_type": "物質",
+    "partner_influence": "毒、糸、群れ",
+    "visual_rule": "鉱石・道具・機械・建築を主身体に保ち、外骨格・複眼・節足を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "物質",
+    "partner_type": "水棲",
+    "result_primary_type": "物質",
+    "partner_influence": "水中適応、泡、潮",
+    "visual_rule": "鉱石・道具・機械・建築を主身体に保ち、ひれ・えら・殻・触手を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "物質",
+    "partner_type": "物質",
+    "result_primary_type": "物質",
+    "partner_influence": "装甲、機構、無機質化",
+    "visual_rule": "鉱石・道具・機械・建築を主身体に保ち、鉱石・道具・機械・建築を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "物質",
+    "partner_type": "不死",
+    "result_primary_type": "物質",
+    "partner_influence": "呪い、吸収、夜行",
+    "visual_rule": "鉱石・道具・機械・建築を主身体に保ち、骨・霊火・影・包帯を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "物質",
+    "partner_type": "幻魔",
+    "result_primary_type": "物質",
+    "partner_influence": "魔法、幻惑、儀式",
+    "visual_rule": "鉱石・道具・機械・建築を主身体に保ち、魔力体・人型・異界器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "不死",
+    "partner_type": "スライム",
+    "result_primary_type": "不死",
+    "partner_influence": "柔軟、分裂、吸収",
+    "visual_rule": "骨・霊火・影・包帯を主身体に保ち、粘体・滴・弾力を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "不死",
+    "partner_type": "ドラゴン",
+    "result_primary_type": "不死",
+    "partner_influence": "鱗、息、威圧",
+    "visual_rule": "骨・霊火・影・包帯を主身体に保ち、鱗・角・尾・ブレス器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "不死",
+    "partner_type": "けもの",
+    "result_primary_type": "不死",
+    "partner_influence": "本能、嗅覚、突進",
+    "visual_rule": "骨・霊火・影・包帯を主身体に保ち、毛皮・牙・四肢を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "不死",
+    "partner_type": "鳥翼",
+    "result_primary_type": "不死",
+    "partner_influence": "飛行、風、歌声",
+    "visual_rule": "骨・霊火・影・包帯を主身体に保ち、翼・羽毛・くちばしを20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "不死",
+    "partner_type": "自然",
+    "result_primary_type": "不死",
+    "partner_influence": "再生、胞子、根",
+    "visual_rule": "骨・霊火・影・包帯を主身体に保ち、葉・菌糸・樹皮・花を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "不死",
+    "partner_type": "むし",
+    "result_primary_type": "不死",
+    "partner_influence": "毒、糸、群れ",
+    "visual_rule": "骨・霊火・影・包帯を主身体に保ち、外骨格・複眼・節足を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "不死",
+    "partner_type": "水棲",
+    "result_primary_type": "不死",
+    "partner_influence": "水中適応、泡、潮",
+    "visual_rule": "骨・霊火・影・包帯を主身体に保ち、ひれ・えら・殻・触手を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "不死",
+    "partner_type": "物質",
+    "result_primary_type": "不死",
+    "partner_influence": "装甲、機構、無機質化",
+    "visual_rule": "骨・霊火・影・包帯を主身体に保ち、鉱石・道具・機械・建築を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "不死",
+    "partner_type": "不死",
+    "result_primary_type": "不死",
+    "partner_influence": "呪い、吸収、夜行",
+    "visual_rule": "骨・霊火・影・包帯を主身体に保ち、骨・霊火・影・包帯を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "不死",
+    "partner_type": "幻魔",
+    "result_primary_type": "不死",
+    "partner_influence": "魔法、幻惑、儀式",
+    "visual_rule": "骨・霊火・影・包帯を主身体に保ち、魔力体・人型・異界器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "幻魔",
+    "partner_type": "スライム",
+    "result_primary_type": "幻魔",
+    "partner_influence": "柔軟、分裂、吸収",
+    "visual_rule": "魔力体・人型・異界器官を主身体に保ち、粘体・滴・弾力を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "幻魔",
+    "partner_type": "ドラゴン",
+    "result_primary_type": "幻魔",
+    "partner_influence": "鱗、息、威圧",
+    "visual_rule": "魔力体・人型・異界器官を主身体に保ち、鱗・角・尾・ブレス器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "幻魔",
+    "partner_type": "けもの",
+    "result_primary_type": "幻魔",
+    "partner_influence": "本能、嗅覚、突進",
+    "visual_rule": "魔力体・人型・異界器官を主身体に保ち、毛皮・牙・四肢を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "幻魔",
+    "partner_type": "鳥翼",
+    "result_primary_type": "幻魔",
+    "partner_influence": "飛行、風、歌声",
+    "visual_rule": "魔力体・人型・異界器官を主身体に保ち、翼・羽毛・くちばしを20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "幻魔",
+    "partner_type": "自然",
+    "result_primary_type": "幻魔",
+    "partner_influence": "再生、胞子、根",
+    "visual_rule": "魔力体・人型・異界器官を主身体に保ち、葉・菌糸・樹皮・花を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "幻魔",
+    "partner_type": "むし",
+    "result_primary_type": "幻魔",
+    "partner_influence": "毒、糸、群れ",
+    "visual_rule": "魔力体・人型・異界器官を主身体に保ち、外骨格・複眼・節足を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "幻魔",
+    "partner_type": "水棲",
+    "result_primary_type": "幻魔",
+    "partner_influence": "水中適応、泡、潮",
+    "visual_rule": "魔力体・人型・異界器官を主身体に保ち、ひれ・えら・殻・触手を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "幻魔",
+    "partner_type": "物質",
+    "result_primary_type": "幻魔",
+    "partner_influence": "装甲、機構、無機質化",
+    "visual_rule": "魔力体・人型・異界器官を主身体に保ち、鉱石・道具・機械・建築を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "幻魔",
+    "partner_type": "不死",
+    "result_primary_type": "幻魔",
+    "partner_influence": "呪い、吸収、夜行",
+    "visual_rule": "魔力体・人型・異界器官を主身体に保ち、骨・霊火・影・包帯を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  },
+  {
+    "bloodline_type": "幻魔",
+    "partner_type": "幻魔",
+    "result_primary_type": "幻魔",
+    "partner_influence": "魔法、幻惑、儀式",
+    "visual_rule": "魔力体・人型・異界器官を主身体に保ち、魔力体・人型・異界器官を20〜35%加える",
+    "system_rule": "基本レシピ。相手要素は副タグ・外見・耐性・継承特技へ反映"
+  }
+]

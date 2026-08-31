@@ -1,0 +1,556 @@
+[
+  {
+    "recipe_id": "F001",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "U2-03",
+    "bloodline_name": "リーフゴレム",
+    "partner_ids": [
+      "U2-10"
+    ],
+    "partner_names": [
+      "ソルピリカ"
+    ],
+    "target_id": "U4-06",
+    "target_name": "フレアゴレム",
+    "target_tier": "上位",
+    "target_type": "物質",
+    "design_rationale": "苔岩の体へ火精の核を入れ、溶岩巨像を作る",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F002",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "U2-09",
+    "bloodline_name": "リーフタートル",
+    "partner_ids": [
+      "U2-10"
+    ],
+    "partner_names": [
+      "ソルピリカ"
+    ],
+    "target_id": "U4-13",
+    "target_name": "フレアガメ",
+    "target_tier": "上位",
+    "target_type": "幻魔",
+    "design_rationale": "甲羅へ火山性を定着させる",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F003",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "U1-16",
+    "bloodline_name": "リーフフォーン",
+    "partner_ids": [
+      "U2-22"
+    ],
+    "partner_names": [
+      "アストラピリカ"
+    ],
+    "target_id": "U4-19",
+    "target_name": "アストラセントス",
+    "target_tier": "上位",
+    "target_type": "幻魔",
+    "design_rationale": "森の子ジカへ星精の加護を与える",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F004",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "U2-11",
+    "bloodline_name": "ウィッチクロウ",
+    "partner_ids": [
+      "U2-10"
+    ],
+    "partner_names": [
+      "ソルピリカ"
+    ],
+    "target_id": "U4-22",
+    "target_name": "フレアフェニクス",
+    "target_tier": "上位",
+    "target_type": "鳥翼",
+    "design_rationale": "黒い鳥へ火精の核を継承する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F005",
+    "recipe_kind": "複数固定の特殊合体",
+    "bloodline_id": "U1-30",
+    "bloodline_name": "アクアドラゴ",
+    "partner_ids": [
+      "U3-17",
+      "G1-21"
+    ],
+    "partner_names": [
+      "アクアフィン",
+      "マグネッチ"
+    ],
+    "target_id": "U4-21",
+    "target_name": "ゴルドマリドラ",
+    "target_tier": "上位",
+    "target_type": "ドラゴン",
+    "design_rationale": "水竜へ魚の水中適応と磁性装甲を加える",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F006",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "U1-08",
+    "bloodline_name": "フレアスカル",
+    "partner_ids": [
+      "U5-29"
+    ],
+    "partner_names": [
+      "ノクスリーパー"
+    ],
+    "target_id": "U4-23",
+    "target_name": "ゴルドリッチ",
+    "target_tier": "上位",
+    "target_type": "不死",
+    "design_rationale": "小ガイコツを血統に、死神の呪力を王格へ凝縮する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F007",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "U1-26",
+    "bloodline_name": "トラッププラント",
+    "partner_ids": [
+      "U5-22"
+    ],
+    "partner_names": [
+      "マーシュトレント"
+    ],
+    "target_id": "U4-24",
+    "target_name": "ギガトラップ",
+    "target_tier": "上位",
+    "target_type": "自然",
+    "design_rationale": "捕食器官と巨樹の生命力を固定する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F008",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "U2-04",
+    "bloodline_name": "フロストラビ",
+    "partner_ids": [
+      "U2-22"
+    ],
+    "partner_names": [
+      "アストラピリカ"
+    ],
+    "target_id": "U5-11",
+    "target_name": "アストララビ",
+    "target_tier": "中位",
+    "target_type": "けもの",
+    "design_rationale": "氷兎へ星月の性質を混ぜる",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F009",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "U2-14",
+    "bloodline_name": "マッシュ",
+    "partner_ids": [
+      "G1-17"
+    ],
+    "partner_names": [
+      "ベルル"
+    ],
+    "target_id": "U5-15",
+    "target_name": "ソナマッシュ",
+    "target_tier": "中位",
+    "target_type": "自然",
+    "design_rationale": "旅キノコへ音の器官を加える",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F010",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "U1-09",
+    "bloodline_name": "モール",
+    "partner_ids": [
+      "U1-03"
+    ],
+    "partner_names": [
+      "アクアビートル"
+    ],
+    "target_id": "U5-18",
+    "target_name": "ヴェノモール",
+    "target_tier": "中位",
+    "target_type": "けもの",
+    "design_rationale": "鉱石を掘る本能と結晶甲殻を合わせる",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F011",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G1-08",
+    "bloodline_name": "カップルル",
+    "partner_ids": [
+      "G2-12"
+    ],
+    "partner_names": [
+      "ユゲポワ"
+    ],
+    "target_id": "G3-02",
+    "target_name": "ポットゴレム",
+    "target_tier": "中位",
+    "target_type": "物質",
+    "design_rationale": "器の体へ蒸気生命を宿す",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F012",
+    "recipe_kind": "複数固定の特殊合体",
+    "bloodline_id": "G1-09",
+    "bloodline_name": "トキッコ",
+    "partner_ids": [
+      "G1-21",
+      "G2-06"
+    ],
+    "partner_names": [
+      "マグネッチ",
+      "コメットン"
+    ],
+    "target_id": "G3-30",
+    "target_name": "クロノけ",
+    "target_tier": "中位",
+    "target_type": "物質",
+    "design_rationale": "時計・磁力・天体指向を一つの機構へ統合する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F013",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G1-10",
+    "bloodline_name": "ポストン",
+    "partner_ids": [
+      "G1-29"
+    ],
+    "partner_names": [
+      "メジャリン"
+    ],
+    "target_id": "G3-09",
+    "target_name": "かばんミミッ",
+    "target_tier": "中位",
+    "target_type": "物質",
+    "design_rationale": "収納ミミックへ伸縮機構を加え旅行かばん化する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F014",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G1-06",
+    "bloodline_name": "ゼンマイドール",
+    "partner_ids": [
+      "G1-22"
+    ],
+    "partner_names": [
+      "ピンコ"
+    ],
+    "target_id": "G3-13",
+    "target_name": "り",
+    "target_tier": "中位",
+    "target_type": "物質",
+    "design_rationale": "ぜんまい人形を安全ピンの関節で戦闘用にする",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F015",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G1-18",
+    "bloodline_name": "ハモニカン",
+    "partner_ids": [
+      "G1-30"
+    ],
+    "partner_names": [
+      "ボタンボール"
+    ],
+    "target_id": "G3-01",
+    "target_name": "アコーディオン",
+    "target_tier": "中位",
+    "target_type": "けもの",
+    "design_rationale": "音の道具と多数のボタンを蛇腹装甲へまとめる",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F016",
+    "recipe_kind": "複数固定の特殊合体",
+    "bloodline_id": "G3-30",
+    "bloodline_name": "クロノけ",
+    "partner_ids": [
+      "G3-17",
+      "G2-05"
+    ],
+    "partner_names": [
+      "スノードームゴレ",
+      "オロロール"
+    ],
+    "target_id": "G5-24",
+    "target_name": "インフィニティコ",
+    "target_tier": "最上位",
+    "target_type": "物質",
+    "design_rationale": "中位方位機構へ小世界とオーロラ動力を組み込み、無限方位盤へ昇華する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F017",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G3-28",
+    "bloodline_name": "ミラレイス",
+    "partner_ids": [
+      "G3-24"
+    ],
+    "partner_names": [
+      "ルークナイト"
+    ],
+    "target_id": "G4-10",
+    "target_name": "ミラナイト",
+    "target_tier": "上位",
+    "target_type": "物質",
+    "design_rationale": "鏡霊を騎士の血統へ封じ、迷宮装甲にする",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F018",
+    "recipe_kind": "複数固定の特殊合体",
+    "bloodline_id": "G3-03",
+    "bloodline_name": "ソナムカデ",
+    "partner_ids": [
+      "G3-14",
+      "G2-01"
+    ],
+    "partner_names": [
+      "ディスクウォード",
+      "カゲプル"
+    ],
+    "target_id": "G4-08",
+    "target_name": "ソナピアノ",
+    "target_tier": "上位",
+    "target_type": "物質",
+    "design_rationale": "音盤・多脚・影だまりから巨大演奏魔を作る",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F019",
+    "recipe_kind": "複数固定の特殊合体",
+    "bloodline_id": "G3-11",
+    "bloodline_name": "ギガント",
+    "partner_ids": [
+      "G3-22",
+      "G2-06"
+    ],
+    "partner_names": [
+      "フレアオーブン",
+      "コメットン"
+    ],
+    "target_id": "G4-09",
+    "target_name": "メテオフォージ",
+    "target_tier": "上位",
+    "target_type": "物質",
+    "design_rationale": "風力炉へ隕石核を落とし込む",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F020",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G3-20",
+    "bloodline_name": "ポストゴレム",
+    "partner_ids": [
+      "G3-18"
+    ],
+    "partner_names": [
+      "ミミッ"
+    ],
+    "target_id": "G4-22",
+    "target_name": "コロッサ",
+    "target_tier": "上位",
+    "target_type": "物質",
+    "design_rationale": "二つの都市設備を遊園地を背負う巨像へ拡張する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F021",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G4-02",
+    "bloodline_name": "クロノギガント",
+    "partner_ids": [
+      "G5-24"
+    ],
+    "partner_names": [
+      "インフィニティコ"
+    ],
+    "target_id": "G5-16",
+    "target_name": "アルカディヴァ",
+    "target_tier": "最上位",
+    "target_type": "物質",
+    "design_rationale": "宮殿時計と無限方位盤を世界時計へ統合する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F022",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G4-10",
+    "bloodline_name": "ミラナイト",
+    "partner_ids": [
+      "G4-23"
+    ],
+    "partner_names": [
+      "ルナ"
+    ],
+    "target_id": "G5-11",
+    "target_name": "ソルセインティア",
+    "target_tier": "最上位",
+    "target_type": "物質",
+    "design_rationale": "鏡迷宮へ月観測の聖性を加える",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F023",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G4-12",
+    "bloodline_name": "ノクス",
+    "partner_ids": [
+      "G4-30"
+    ],
+    "partner_names": [
+      "アルカガーディア"
+    ],
+    "target_id": "G5-19",
+    "target_name": "ノクスく",
+    "target_tier": "最上位",
+    "target_type": "幻魔",
+    "design_rationale": "黒穴魔術と異次元門を固定して虚空の主を作る",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F024",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G4-28",
+    "bloodline_name": "ソル",
+    "partner_ids": [
+      "G4-30"
+    ],
+    "partner_names": [
+      "アルカガーディア"
+    ],
+    "target_id": "G5-17",
+    "target_name": "アストラつ",
+    "target_tier": "最上位",
+    "target_type": "物質",
+    "design_rationale": "虹大聖堂を異界へ接続し星雲化する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F025",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G4-09",
+    "bloodline_name": "メテオフォージ",
+    "partner_ids": [
+      "G4-06"
+    ],
+    "partner_names": [
+      "ソナ"
+    ],
+    "target_id": "G5-20",
+    "target_name": "アストラえる",
+    "target_tier": "最上位",
+    "target_type": "物質",
+    "design_rationale": "隕石炉と黒曜石の音楽箱を星鍛造炉へ昇華する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F026",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G4-16",
+    "bloodline_name": "パペットキング",
+    "partner_ids": [
+      "G4-26"
+    ],
+    "partner_names": [
+      "ゴルドキング"
+    ],
+    "target_id": "G5-29",
+    "target_name": "アストラエンペラ",
+    "target_tier": "最上位",
+    "target_type": "物質",
+    "design_rationale": "操り王へ多数の王権を集め宇宙皇帝化する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F027",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G4-03",
+    "bloodline_name": "ドミナ",
+    "partner_ids": [
+      "G4-17"
+    ],
+    "partner_names": [
+      "ルーレット"
+    ],
+    "target_id": "G5-12",
+    "target_name": "マスカレイドキン",
+    "target_tier": "最上位",
+    "target_type": "幻魔",
+    "design_rationale": "日食の支配力と賭けの魔性を道化王へまとめる",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F028",
+    "recipe_kind": "固定×固定",
+    "bloodline_id": "G4-15",
+    "bloodline_name": "ステンドグラス",
+    "partner_ids": [
+      "G4-23"
+    ],
+    "partner_names": [
+      "ルナ"
+    ],
+    "target_id": "G5-15",
+    "target_name": "アストラディヴァ",
+    "target_tier": "最上位",
+    "target_type": "物質",
+    "design_rationale": "光の翼と月観測を天球観測神へ昇華する",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F029",
+    "recipe_kind": "複数固定の特殊合体",
+    "bloodline_id": "G4-01",
+    "bloodline_name": "ソルコロッサ",
+    "partner_ids": [
+      "G4-19",
+      "G4-24"
+    ],
+    "partner_names": [
+      "ソナガーゴ",
+      "ソナギガント"
+    ],
+    "target_id": "G5-06",
+    "target_name": "ソルガーディア",
+    "target_tier": "最上位",
+    "target_type": "物質",
+    "design_rationale": "三種の巨大な響きを山の守護者へ束ねる",
+    "status": "試作・能力システム確定後に再検証"
+  },
+  {
+    "recipe_id": "F030",
+    "recipe_kind": "複数固定の特殊合体",
+    "bloodline_id": "G4-16",
+    "bloodline_name": "パペットキング",
+    "partner_ids": [
+      "G4-04",
+      "G4-30"
+    ],
+    "partner_names": [
+      "テンペストシップ",
+      "アルカガーディア"
+    ],
+    "target_id": "G5-27",
+    "target_name": "ドリームシアター",
+    "target_tier": "最上位",
+    "target_type": "物質",
+    "design_rationale": "人形劇・幽霊船・異界門から夢劇場を成立させる",
+    "status": "試作・能力システム確定後に再検証"
+  }
+]

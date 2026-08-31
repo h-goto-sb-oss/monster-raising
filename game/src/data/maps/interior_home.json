@@ -1,0 +1,100 @@
+{
+  "tile_px": 64,
+  "room_tiles": [
+    16,
+    12
+  ],
+  "door_tiles": [
+    [
+      7,
+      10
+    ],
+    [
+      8,
+      10
+    ]
+  ],
+  "collisions": [
+    {
+      "name": "bed",
+      "rect_tiles": [
+        2,
+        2,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "bookshelf",
+      "rect_tiles": [
+        12,
+        2,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "kitchen_counter",
+      "rect_tiles": [
+        6,
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "name": "stove",
+      "rect_tiles": [
+        9,
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "table",
+      "rect_tiles": [
+        6,
+        5,
+        2,
+        1
+      ]
+    },
+    {
+      "name": "chair_left",
+      "rect_tiles": [
+        5,
+        6,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "chair_right",
+      "rect_tiles": [
+        8,
+        6,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "wardrobe",
+      "rect_tiles": [
+        12,
+        6,
+        1,
+        2
+      ]
+    },
+    {
+      "name": "fireplace",
+      "rect_tiles": [
+        2,
+        7,
+        2,
+        1
+      ]
+    }
+  ]
+}

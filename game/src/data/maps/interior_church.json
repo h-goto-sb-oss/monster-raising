@@ -1,0 +1,82 @@
+{
+  "tile_px": 64,
+  "room_tiles": [
+    16,
+    12
+  ],
+  "door_tiles": [
+    [
+      7,
+      10
+    ],
+    [
+      8,
+      10
+    ]
+  ],
+  "collisions": [
+    {
+      "name": "stained_glass",
+      "rect_tiles": [
+        7,
+        1,
+        2,
+        2
+      ]
+    },
+    {
+      "name": "altar",
+      "rect_tiles": [
+        6,
+        3,
+        3,
+        1
+      ]
+    },
+    {
+      "name": "candle_left",
+      "rect_tiles": [
+        4,
+        3,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "candle_right",
+      "rect_tiles": [
+        11,
+        3,
+        1,
+        1
+      ]
+    },
+    {
+      "name": "pew_left",
+      "rect_tiles": [
+        4,
+        6,
+        2,
+        1
+      ]
+    },
+    {
+      "name": "pew_center",
+      "rect_tiles": [
+        7,
+        6,
+        2,
+        1
+      ]
+    },
+    {
+      "name": "pew_right",
+      "rect_tiles": [
+        10,
+        6,
+        2,
+        1
+      ]
+    }
+  ]
+}
