@@ -29,6 +29,9 @@ function rebasePublicAssetPaths() {
     transform(code, id) {
       if (base === '/') return null
       const file = id.split('?')[0]
+      // 書き換えるのは自分で書いたものだけ。ライブラリ側にたまたま
+      // '/assets/' という文字列があっても触らない。
+      if (file.includes('node_modules')) return null
       if (!/\.(jsx?|css|json)$/.test(file)) return null
       if (!code.includes('/assets/')) return null
       return { code: code.split('/assets/').join(`${base}assets/`), map: null }

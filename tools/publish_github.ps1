@@ -94,7 +94,11 @@ Write-Host "== 4. GitHub Pages を有効化します ==" -ForegroundColor Cyan
 if ($LASTEXITCODE -ne 0) {
   & $gh api -X PUT "repos/$owner/$repo/pages" -f "source[branch]=gh-pages" -f "source[path]=/" *>$null
 }
-& $gh api "repos/$owner/$repo/pages" --jq '"配信元: " + .source.branch + .source.path + " / 状態: " + (.status // "building")'
+# --jq に渡す式に空白を入れると PowerShell が引数を分割してしまうので、
+# 空白の無い式を1つずつ問い合わせる。
+$pagesBranch = & $gh api "repos/$owner/$repo/pages" --jq .source.branch
+$pagesStatus = & $gh api "repos/$owner/$repo/pages" --jq .status
+Write-Host "配信元ブランチ: $pagesBranch / 状態: $pagesStatus" -ForegroundColor DarkGray
 
 Write-Host ""
 Write-Host "公開URL: https://$owner.github.io/$repo/" -ForegroundColor Green
