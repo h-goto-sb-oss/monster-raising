@@ -22,6 +22,9 @@
 
 import Phaser from 'phaser';
 import { ailmentList, modList } from '../engine/battle/ailments.js';
+import {
+  FX_SHEETS, FX_KEYS, FX_FRAME, FX_FRAME_RATE, FX_STAGGER_MS, FX_SCALE,
+} from '../engine/battle/effects.js';
 
 /** 背景画像の元サイズ。cover フィットの計算に使う。 */
 const BG_NATIVE = { width: 1024, height: 768 };
@@ -145,6 +148,109 @@ export class BattleScene extends Phaser.Scene {
         this.load.image(c.monsterId, c.spriteUrl);
       }
     });
+
+    // 攻撃・呪文の演出。8枚とも 192px の6コマ。
+    //
+    // 読み込みに失敗しても戦闘は止めない。Phaser のローダーは1枚こけても
+    // 残りを読んで create() へ進むので、あとは playFx() が
+    // 「アニメが無い名前は黙って飛ばす」だけで済む。
+    // ここで this.load.on('loaderror') を潰しておかないと、コンソールに
+    // 例外が出て「戦闘が壊れた」ように見えてしまう。
+    this.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, (file) => {
+      if (file?.key?.startsWith('fx:')) console.warn(`[BattleScene] 演出の絵を読めませんでした: ${file.key}`);
+    });
+    FX_KEYS.forEach((key) => {
+      const texKey = `fx:${key}`;
+      if (this.textures.exists(texKey)) return;
+      this.load.spritesheet(texKey, FX_SHEETS[key], {
+        frameWidth: FX_FRAME.size,
+        frameHeight: FX_FRAME.size,
+      });
+    });
+  }
+
+  /**
+   * 演出のアニメーションを作る。絵が読めていない名前は作らない
+   * (作ろうとすると Phaser が例外を投げて create() ごと落ちる)。
+   * アニメはゲーム全体で共有されるので、戦闘のたびに作り直さない。
+   */
+  buildFxAnimations() {
+    FX_KEYS.forEach((key) => {
+      const texKey = `fx:${key}`;
+      if (!this.textures.exists(texKey)) return;
+      if (this.anims.exists(texKey)) return;
+      const tex = this.textures.get(texKey);
+      // コマ数は実際のテクスチャから数える。素材が5コマや8コマで
+      // 描き直されて届いても、ここが勝手に付いていく。
+      const total = Math.max(1, tex.frameTotal - 1); // '__BASE' のぶんを引く
+      this.anims.create({
+        key: texKey,
+        frames: this.anims.generateFrameNumbers(texKey, { start: 0, end: total - 1 }),
+        frameRate: FX_FRAME_RATE,
+        repeat: 0,
+      });
+    });
+  }
+
+  /**
+   * ターンの解決で溜まった演出をまとめて再生する。
+   *
+   * **ここでターンを止めることは絶対にしない**。BattleEngine は既に
+   * 全部の行動を解決し終わっていて、これはその「あとから流す絵」でしかない。
+   * 絵が1枚も読めていなくても、途中でシーンが閉じても、戦闘の進行には
+   * 何の影響も無い(だから全部 try/catch で包んで、失敗は握りつぶす)。
+   *
+   * @param {{key:string, targetIds:string[]}[]} events engine.takeFx() の返り値
+   */
+  playFx(events) {
+    if (!this.ready || !Array.isArray(events) || events.length === 0) return;
+    events.forEach((ev, i) => {
+      const texKey = `fx:${ev.key}`;
+      if (!this.anims.exists(texKey)) return; // 絵が来ていない = 何も出さないだけ
+      const delay = i * FX_STAGGER_MS;
+      // 全体技は対象ぜんぶの上で **同時に** 出す。ここをずらすと
+      // 「1体ずつ殴っている」ように見えて、全体技だと伝わらない。
+      ev.targetIds.forEach((id) => this.spawnFx(texKey, id, delay));
+    });
+  }
+
+  /** 1体ぶんの演出スプライトを出す。終わったら自分で消える。 */
+  spawnFx(texKey, instanceId, delay) {
+    const entry = this.spriteMap[instanceId];
+    if (!entry) return;
+    try {
+      // 体の中心のあたり。足元基準のスプライトなので、高さの半分だけ上げる。
+      const x = entry.baseX;
+      const y = entry.baseY - entry.size * 0.5;
+      const sprite = this.add.sprite(x, y, texKey, 0)
+        .setOrigin(0.5, 0.5)
+        // モンスター(10〜16)より手前、とび出る数字(40)より奥。
+        // 数字が演出に隠れると、何ダメージ入ったのか読めなくなる。
+        .setDepth(30)
+        .setVisible(false);
+      // 192pxの絵を、そのモンスターの背丈に合わせて縮める。
+      // 画面の大きさではなくモンスターの大きさを基準にするので、
+      // スマホでもPCでも「相手に対して同じ大きさ」に見える。
+      const size = entry.size * FX_SCALE;
+      sprite.setDisplaySize(size, size);
+      if (delay > 0) {
+        this.time.delayedCall(delay, () => {
+          if (!sprite.scene) return; // 戦闘が終わってシーンが閉じた
+          sprite.setVisible(true);
+          sprite.play(texKey);
+        });
+      } else {
+        sprite.setVisible(true);
+        sprite.play(texKey);
+      }
+      sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => sprite.destroy());
+      // 保険。何かの理由でアニメが終わらなくても、必ず片づける。
+      this.time.delayedCall(delay + 2000, () => {
+        if (sprite.scene) sprite.destroy();
+      });
+    } catch (err) {
+      console.warn('[BattleScene] 演出を出せませんでした', err);
+    }
   }
 
   create() {
@@ -157,6 +263,8 @@ export class BattleScene extends Phaser.Scene {
     }
     // 上下にごく薄い暗幕を敷いて、重ねるUIの文字が背景に負けないようにする。
     this.vignette = this.add.graphics().setDepth(-5);
+
+    this.buildFxAnimations();
 
     if (state) {
       this.buildRow(state.enemyParty, false);

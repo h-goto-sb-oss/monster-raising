@@ -21,6 +21,7 @@ import { decideEnemyAction, decideTacticAction } from './ai.js';
 import { enemyExpValue, gainExp } from '../growth.js';
 import { rollRecruit, recruitMessage } from '../recruit.js';
 import { skillTargetKind, TARGET } from '../skills.js';
+import { effectForSkill, effectForItem, BASIC_ATTACK_FX } from './effects.js';
 import {
   AILMENT_IDS,
   CONFUSION_RAMPAGE_CHANCE,
@@ -72,9 +73,37 @@ export class BattleEngine {
     // 経験値しか入らないし、仲間になった個体も Lv1 で生まれてしまう。
     this.defeatedEnemies = [];
     this.rewards = null;
+    // 結果画面のページ割り。_finishBattle が組み立てる (中身の説明はそちら)。
+    this.resultPages = [];
     this.recruitMultiplier = 1; // 餌アイテムで上がる。この戦闘のあいだだけ有効。
     this.abandonedDungeon = false; // キメラのつばさで帰ったか
+    // このターンに起きた「見せたい一撃」の並び。{ key, targetIds } の配列で、
+    // 中身は engine/battle/effects.js のエフェクト名と、当たった相手。
+    //
+    // **これはログと同じで、ただの記録** — 演出が再生されるのを待って
+    // ターンの解決を止めることは一切しない。絵が1枚も読めていなくても
+    // 戦闘は最後まで進む(BattleScene 側が黙って読み飛ばす)。
+    this.fx = [];
     this.pushLog(`戦闘開始！ ${this.enemyParty.map((e) => e.name).join('、')} が現れた！`);
+  }
+
+  /**
+   * 出したいエフェクトを1つ記録する。
+   * @param {string|null} key effects.js のエフェクト名
+   * @param {object[]} targets 当たった相手。全体技なら複数入る。
+   */
+  _emitFx(key, targets) {
+    if (!key) return;
+    const ids = (targets || []).filter(Boolean).map((t) => t.instanceId);
+    if (ids.length === 0) return;
+    this.fx.push({ key, targetIds: ids });
+  }
+
+  /** 溜まったエフェクトを取り出して空にする。UI が1ターンに1回だけ呼ぶ。 */
+  takeFx() {
+    const out = this.fx;
+    this.fx = [];
+    return out;
   }
 
   pushLog(text) {
@@ -109,14 +138,39 @@ export class BattleEngine {
       : { own: this.enemyParty, foe: this.playerParty };
   }
 
-  /** マニュアル操作が必要なプレイヤーメンバー(さくせん未設定 かつ 生存) */
+  /**
+   * このターン、コマンドを聞くべきプレイヤーメンバー = **生きている全員**。
+   *
+   * v0.6 まではここで「さくせんを設定した子」を外していた。その結果、
+   * 一度でも さくせんを「ガンガンいこうぜ」などに変えると、その子には
+   * 二度とコマンド欄が出ず、どうぐで回復もできず、さくせんを戻すことも、
+   * にげることもできなくなっていた
+   * (「さくせんを戦闘中にガンガンなどに変えると、それ以降変更できず
+   *   回復等もおこなえません」— 博史さん)。
+   *
+   * いまは さくせんを設定していても コマンドは必ず聞く。変わるのは
+   * **たたかう の中身だけ**で、さくせん中は こうげき/とくぎ/ぼうぎょ を
+   * 選ばせずに さくせんAIが選んだ行動をそのまま出す
+   * (行動は {command:'tactic'} として積み、resolveTurn で解決する)。
+   * どうぐ・さくせん・にげる は さくせんの有無にかかわらず そのまま使える。
+   */
   membersNeedingManualAction() {
-    return this.alivePlayers().filter((c) => !c.tactic);
+    return this.alivePlayers();
   }
 
   setPlayerAction(instanceId, action) {
     if (this.phase !== PHASE.SELECT) return;
     this.pendingActions[instanceId] = action;
+  }
+
+  /**
+   * 積みかけの行動を捨てて、このターンのコマンド選択を頭からやり直す。
+   * さくせんを戦闘中に変えたときに使う — 変える前に積んだ「たたかう」は
+   * 古いさくせんで動いてしまうので、そのまま残すと1ターンぶん食い違う。
+   */
+  clearPendingActions() {
+    if (this.phase !== PHASE.SELECT) return;
+    this.pendingActions = {};
   }
 
   allActionsReady() {
@@ -140,7 +194,7 @@ export class BattleEngine {
     });
   }
 
-  /** 現在のさくせん未設定メンバー1名（UIが次に入力を求めるべき相手） */
+  /** まだコマンドを決めていないメンバー1名（UIが次に入力を求めるべき相手） */
   nextMemberNeedingAction() {
     return this.membersNeedingManualAction().find((c) => !this.pendingActions[c.instanceId]) || null;
   }
@@ -253,6 +307,7 @@ export class BattleEngine {
       // こんらん中は味方も殴るので、対象は事前に確定させたものを優先する
       const target = action.confused ? this.getCombatant(action.targetId) : targets[0];
       if (!target || target.hp <= 0) return;
+      this._emitFx(BASIC_ATTACK_FX, [target]);
       const result = calcPhysicalDamage(actor, target, { power: 20, defending: !!target.defending });
       this._applyDamage(actor, target, result, 'こうげき');
       return;
@@ -280,6 +335,12 @@ export class BattleEngine {
     });
 
     this.pushLog(`${actor.name} は ${skill.name} を つかった！`);
+
+    // 見せる一撃。**対象が決まった時点で** 記録する(当たったか外したかは
+    // 問わない — 技を放った事実は同じで、外したことは数字とログが伝える)。
+    // 全体技は targets が複数なので、そのまま全員の上で光る。
+    // 自分にかける技(SELF)なら targets は自分1体になる。
+    this._emitFx(effectForSkill(skill), targets);
 
     // --- ダンス: たまに空振りする、気まぐれな枠 ---
     if (skill.type === 'ダンス') {
@@ -416,6 +477,7 @@ export class BattleEngine {
       const target = aliveFoe[Math.floor(Math.random() * aliveFoe.length)];
       const result = calcPhysicalDamage(actor, target, { power: (skill.power || 20) * 2 });
       this.pushLog('おどりは はげしい つむじ風に なった！');
+      this._emitFx('zangeki', [target]); // つむじ風。おどり自体の光は既に出ている
       this._applyDamage(actor, target, result, skill.name);
       return;
     }
@@ -452,6 +514,14 @@ export class BattleEngine {
       downedOnly,
       includeDowned: downedOnly,
     });
+
+    // どうぐの見せ場。全体に効くものは「効く相手ぜんぶ」の上で光らせる。
+    const itemFx = effectForItem(item);
+    if (itemFx) {
+      if (item.effect === 'damage_all') this._emitFx(itemFx, this.enemyParty.filter((c) => c.hp > 0));
+      else if (item.effect === 'heal_hp_full_all') this._emitFx(itemFx, this.playerParty.filter((c) => c.hp > 0));
+      else this._emitFx(itemFx, targets);
+    }
 
     if (item.effect === 'heal_hp') {
       targets.forEach((t) => {
@@ -584,6 +654,9 @@ export class BattleEngine {
     if (!this.allActionsReady()) return;
 
     this.phase = PHASE.RESOLVING;
+    // このターンぶんの演出の記録は、ここで空にする。前のターンの
+    // 取りこぼしが残っていても、それを今のターンで出さないため。
+    this.fx = [];
 
     // 防御フラグをリセット(このターン新たに設定されるもの以外)
     [...this.playerParty, ...this.enemyParty].forEach((c) => {
@@ -592,14 +665,17 @@ export class BattleEngine {
 
     const actions = [];
 
-    // プレイヤー: 手入力 + さくせんAI
+    // プレイヤー: 手入力。「たたかう」を さくせん中に押したぶん
+    // ({command:'tactic'}) は、ここで さくせんAIに中身を決めさせる。
+    //
+    // 選んだ行動が常に手入力を通るので、さくせん中でも どうぐ・にげる が
+    // そのまま効く。AIに丸投げするのは たたかう を押したときだけ。
     this.alivePlayers().forEach((c) => {
-      if (c.tactic) {
-        const action = decideTacticAction(c, this.playerParty, this.enemyParty, this.skillsById);
-        if (action) actions.push({ actor: c, action });
-      } else if (this.pendingActions[c.instanceId]) {
-        actions.push({ actor: c, action: this.pendingActions[c.instanceId] });
-      }
+      const pending = this.pendingActions[c.instanceId];
+      const action = pending?.command === 'tactic'
+        ? decideTacticAction(c, this.playerParty, this.enemyParty, this.skillsById)
+        : pending;
+      if (action) actions.push({ actor: c, action });
     });
 
     // 敵AI
@@ -676,9 +752,35 @@ export class BattleEngine {
    * - 勝利時は生存メンバーへ経験値を分配し、レベルアップと技習得を解決する
    * - 勝利時は倒した敵ごとに野生の仲間化を抽選する (要望2)
    * 結果は this.rewards に置き、UI側が gameStore へ反映する。
+   *
+   * ついでに **結果画面のページ割り** も、ここで作る (this.resultPages)。
+   * 以前は勝利パネルがログの末尾10行をそのまま出していたので、
+   * 「たおした → 経験値 → レベルアップ → 技をおぼえた → 仲間になりたそう」が
+   * 一度に出て、いちばん嬉しいところが埋もれていた。
+   *
+   * 割り方は **行数ではなく意味** で決める。3行ずつ機械的に切ると
+   * 「レベル2に あがった！」と「つばさアタックを おぼえた！」が
+   * 別のページに離れてしまう。これは同じひと息で読ませたい。
+   *   1ページ目 … 勝敗の一行
+   *   2ページ目 … 全員ぶんの獲得経験値 (人数が多ければ RESULT_PAGE_MAX_LINES で分ける)
+   *   以降     … レベルが上がった子ごとに「上がった + おぼえた」をひとまとめ
+   *   最後     … 仲間になりたそうな子。1体につき1ページ (いちばんの見せ場)
+   * どのページも RESULT_PAGE_MAX_LINES 行を超えないので、
+   * スマホ横(390px)でもパネルからあふれない。
    */
   _finishBattle() {
     if (this.rewards) return;
+
+    /** 1ページに載せる行数の上限。超えたぶんは次のページへ送る。 */
+    const RESULT_PAGE_MAX_LINES = 4;
+    const pages = [];
+    /** kind は UI が見出しや色を選ぶための目印。行の中身は解釈しない。 */
+    const addPage = (kind, lines) => {
+      const kept = (lines || []).filter(Boolean);
+      for (let i = 0; i < kept.length; i += RESULT_PAGE_MAX_LINES) {
+        pages.push({ kind, lines: kept.slice(i, i + RESULT_PAGE_MAX_LINES) });
+      }
+    };
 
     // 状態異常は戦闘のあいだだけ。個体には持ち帰らせない。
     [...this.playerParty, ...this.enemyParty].forEach((c) => clearAllStates(c));
@@ -697,7 +799,19 @@ export class BattleEngine {
       clones.push({ combatant: c, clone });
     });
 
-    const recruits = [];
+    // 仲間になりたそうな野生。この時点では **まだ加入していない**。
+    // 「なかまにする / みおくる」をプレイヤーが選んで初めて確定する。
+    // 選ぶのは結果画面(BattleResult.jsx)、確定して rewards へ載せるのは
+    // BattleScreen.jsx。エンジンは「誘いが出たかどうか」までを決める。
+    const recruitOffers = [];
+
+    addPage('outcome', [
+      this.result === RESULT.WIN
+        ? 'てきを すべて たおした！'
+        : this.result === RESULT.LOSE
+          ? 'パーティーは 全滅した…'
+          : 'うまく にげだした！',
+    ]);
 
     if (this.result === RESULT.WIN) {
       const totalExp = this.defeatedEnemies.reduce(
@@ -705,11 +819,20 @@ export class BattleEngine {
         0,
       );
       const survivors = clones.filter((e) => e.combatant.hp > 0);
+      // 経験値の行は全員ぶんをまとめて1ページ、
+      // 「レベルが上がった + 技をおぼえた」は子ごとに1ページにする。
+      const expLines = [];
+      const growthPages = [];
       if (totalExp > 0 && survivors.length > 0) {
         const share = Math.max(1, Math.floor(totalExp / survivors.length));
         survivors.forEach(({ combatant, clone }) => {
           const { logs } = gainExp(clone, combatant.species, share, this.skillsById, combatant.name);
           logs.forEach((l) => this.pushLog(l));
+          // gainExp の1行目は必ず「◯◯ は n の経験値を かくとくした！」
+          // (これいじょう強くなれない場合はその一行だけ)。
+          // 2行目以降がレベルアップと技習得なので、そこで切り分ける。
+          if (logs.length > 0) expLines.push(logs[0]);
+          if (logs.length > 1) growthPages.push(logs.slice(1));
           // レベルアップで最大HPが伸びた分を戦闘表示にも反映する
           combatant.stats = { ...clone.stats };
           combatant.maxHp = clone.stats.hp;
@@ -720,6 +843,8 @@ export class BattleEngine {
           combatant.skills = [...clone.learned];
         });
       }
+      addPage('exp', expLines);
+      growthPages.forEach((lines) => addPage('growth', lines));
 
       if (this.recruitMultiplier > 1) {
         this.pushLog(`えさの においで てきが なつきやすく なっている！（${this.recruitMultiplier}倍）`);
@@ -729,15 +854,25 @@ export class BattleEngine {
       // 深いダンジョンで仲間にする意味が無くなってしまう。
       this.defeatedEnemies.forEach((e) => {
         if (rollRecruit(e.species, Math.random, this.recruitMultiplier)) {
-          recruits.push({ id: e.species.id, level: e.level });
-          this.pushLog(recruitMessage(e.species));
+          const offer = { id: e.species.id, level: e.level, name: e.species.name };
+          recruitOffers.push(offer);
+          const message = recruitMessage(e.species);
+          this.pushLog(message);
+          // 仲間になるのはこの画面いちばんの見せ場。1体ずつ独立したページにする。
+          // ここだけは読ませて終わりではなく **選ばせる** ページなので、
+          // addPage を通さず offer を添えて直接積む(行数で分割されると困る)。
+          pages.push({ kind: 'recruit', lines: [message], offer });
         }
       });
     }
 
+    this.resultPages = pages;
+
     this.rewards = {
       instances: clones.map((e) => e.clone),
-      recruits,
+      // 実際に加える個体は結果画面の選択で決まる。ここは既定値(=誰も加えない)。
+      recruits: [],
+      recruitOffers,
       abandonedDungeon: this.abandonedDungeon,
       recruitMultiplier: this.recruitMultiplier,
     };
@@ -758,6 +893,7 @@ export class BattleEngine {
       result: this.result,
       pendingActions: this.pendingActions,
       recruitMultiplier: this.recruitMultiplier,
+      resultPages: this.resultPages,
     };
   }
 

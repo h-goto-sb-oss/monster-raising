@@ -46,4 +46,29 @@ export function targetsDownedAlly(skill) {
   return !!skill?.revive;
 }
 
-export default { TARGET, skillTargetKind, targetsAllySide, needsTargetPick, targetsDownedAlly };
+/**
+ * 技の要点を短い札の並びにする。「種別・属性」「威力n」「MPn」「対象」。
+ *
+ * メニューの「とくぎ」と 戦闘の技一覧の両方が同じものを出すための共通化。
+ * 別々に組み立てると、片方にだけ属性が出ない・威力の書き方が違う、が必ず起きる。
+ *
+ * 出さないものは出さない: 威力0の強化技に「威力0」と書いても意味がない。
+ * skills.json の description(説明文)は別に出す。ここは要点だけ。
+ */
+export function skillFacts(skill) {
+  if (!skill) return [];
+  const facts = [];
+  facts.push(skill.element ? `${skill.type}・${skill.element}` : skill.type);
+  if (skill.power > 0) {
+    // 回復技の「威力」は回復量なので、言い方を変える。
+    facts.push(skill.type === '回復' || skill.heal ? `回復${skill.power}` : `威力${skill.power}`);
+  }
+  if (skill.hits > 1) facts.push(`${skill.hits}回`);
+  facts.push(`MP${skill.mpCost}`);
+  facts.push(skillTargetKind(skill));
+  return facts;
+}
+
+export default {
+  TARGET, skillTargetKind, targetsAllySide, needsTargetPick, targetsDownedAlly, skillFacts,
+};

@@ -20,6 +20,7 @@ import { useGameStore } from '../../state/gameStore.js';
 import { getTacticsList } from '../../engine/battle/ai.js';
 import { expToNextLevel, MAX_LEVEL } from '../../engine/growth.js';
 import { ancestryState } from '../../engine/instance.js';
+import { skillFacts } from '../../engine/skills.js';
 import { ANCESTRY_DEPTH } from '../../engine/inherit.js';
 import ItemBag from '../Town/ItemBag.jsx';
 import './menuUI.css';
@@ -156,12 +157,42 @@ function PowerDetail({ view, page, skillsById, rosterById }) {
       <div className="mnu-sub">おぼえている とくぎ（{learned.length}）</div>
       {learned.length === 0 && <div className="mnu-empty">まだ ありません。</div>}
       {learned.map((s) => (
-        <div key={s.id} className="mnu-line">
+        // 説明文は「とくぎ」の段に出す。つよさは ひと目で見渡す場所なので、
+        // ここは名前と要点だけにして行数を増やさない。
+        <div key={s.id} className="mnu-line" title={s.description}>
           <span>・{s.name}</span>
-          <span>{s.type}／MP{s.mpCost}</span>
+          <span>{s.element ? `${s.type}・${s.element}` : s.type}／MP{s.mpCost}</span>
         </div>
       ))}
     </>
+  );
+}
+
+/**
+ * とくぎ1つぶんの札。
+ *   1行目 … 名前（ランク） と 右肩の但し書き(継承わくなら「Lv n で おぼえる」)
+ *   2行目 … 要点の札 (種別・属性 / 威力 / MP / 対象)
+ *   3行目 … skills.json の説明文
+ *
+ * 説明文は182本すべてに入っているのに、これまでは title 属性(マウスを
+ * 乗せたときの吹き出し)にしか出しておらず、**スマホでは読む手段が無かった**
+ * (「とくぎの内容は作成されてないかな？」— 博史さん)。指で遊ぶ画面なので、
+ * 隠さず並べて出す。
+ */
+function SkillCard({ skill, note, inherit }) {
+  return (
+    <div className={`mnu-skill${inherit ? ' mnu-skill--inherit' : ''}`}>
+      <div className="mnu-skillhead">
+        <span className="mnu-skillname">
+          {skill.name}{skill.line ? `（ランク${skill.rank}）` : ''}
+        </span>
+        {note && <span className="mnu-skillnote">{note}</span>}
+      </div>
+      <div className="mnu-skillfacts">
+        {skillFacts(skill).map((f) => <i key={f}>{f}</i>)}
+      </div>
+      <div className="mnu-skilldesc">{skill.description}</div>
+    </div>
   );
 }
 
@@ -179,10 +210,7 @@ function SkillDetail({ view, skillsById }) {
       <div className="mnu-sub">おぼえている とくぎ（{learned.length}）</div>
       {learned.length === 0 && <div className="mnu-empty">まだ ありません。</div>}
       {learned.map((s) => (
-        <div key={s.id} className="mnu-line" title={s.description}>
-          <span>・{s.name}</span>
-          <span>{s.type}{s.line ? `／ランク${s.rank}` : ''}／MP{s.mpCost}</span>
-        </div>
+        <SkillCard key={s.id} skill={s} />
       ))}
 
       <div className="mnu-sub mnu-sub--inherit">
@@ -194,10 +222,12 @@ function SkillDetail({ view, skillsById }) {
         </div>
       )}
       {inherited.map((e) => (
-        <div key={e.skillId} className="mnu-line mnu-line--inherit" title={e.skill.description}>
-          <span>・{e.skill.name}{e.skill.line ? `（ランク${e.skill.rank}）` : ''}</span>
-          <span>Lv {e.learnLevel} で おぼえる</span>
-        </div>
+        <SkillCard
+          key={e.skillId}
+          skill={e.skill}
+          note={`Lv ${e.learnLevel} で おぼえる`}
+          inherit
+        />
       ))}
     </>
   );
@@ -480,7 +510,7 @@ const FieldMenu = forwardRef(function FieldMenu({ onClose }, ref) {
             <div className="mnu-empty">
               つよさ … ステータスと おぼえた とくぎ。ページを めくると 家系図。<br />
               どうぐ … ふくろの 中身。<br />
-              とくぎ … おぼえた とくぎと、けいしょうわくの 習得予約。<br />
+              とくぎ … おぼえた とくぎの 説明と、けいしょうわくの 習得予約。<br />
               さくせん … 戦闘での ふるまい。<br />
               <span className="mnu-keys">
                 十字キー: 上下でえらぶ／右ですすむ／左でもどる　決定: しらべる・Z・Enter

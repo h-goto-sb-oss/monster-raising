@@ -45,7 +45,17 @@
    * 「濃紺の窓 + 金の枠 + 黒のキーライン」。描き込まれた背景画の上に
    * 乗せても沈まないよう、枠の外側に必ず黒を1本置く。 */
   --ink: #f4f0e2;         /* 本文 */
-  --ink-dim: #b0b9d2;     /* 添え字 */
+  --ink-dim: #c6cee2;     /* 添え字 */
+  /* いちばん小さい字 (個体値・操作の説明・「記録なし」など)。
+   * 2026-08-31 「ステータスの字…色が薄いので少し見にくいです」(博史さん)。
+   * それまで画面ごとに #7f879c / #767e93 / #6f778c / #666 とばらばらに
+   * 書いてあった薄いグレーを、この1本にまとめて明るくした。
+   *
+   * この字はスマホ横(高さ390px)だと --fs-xs の 0.88em = 約10px まで小さくなる。
+   * その大きさで濃紺の窓の上に乗せるには、窓の地に対して 7:1 は要る。
+   * 旧 #7f879c は 4.7:1 しかなく、小さい字だと形がつぶれて読めなかった。
+   * これより暗い色を画面ごとのCSSに書き足さないこと。 */
+  --ink-faint: #a3adc6;
   --ink-gold: #ffd97a;    /* 見出し・強調 */
   --ink-warn: #ff9d5c;
   --ink-good: #8fe0a0;
@@ -176,7 +186,7 @@ button {
 
 .jrpg-btn:disabled {
   background: #23273a;
-  color: #6b7188;
+  color: #949bb0;
   border-color: #3a4058;
   box-shadow: none;
   cursor: default;
@@ -279,7 +289,7 @@ button {
   display: flex;
   justify-content: space-between;
   gap: 6px;
-  border-bottom: 1px dotted rgba(255, 255, 255, 0.12);
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.2);
 }
 
 .idet-stat b {
@@ -288,7 +298,7 @@ button {
 }
 
 .idet-stat i {
-  color: #7f879c;
+  color: var(--ink-faint);
   font-style: normal;
   font-size: 0.88em;
 }
@@ -314,7 +324,7 @@ button {
 }
 
 .idet-none {
-  color: #767e93;
+  color: var(--ink-faint);
 }
 
 /* =======================================================================

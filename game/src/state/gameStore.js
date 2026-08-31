@@ -29,15 +29,25 @@ import {
   usableInTown,
   applyItemToInstance,
 } from '../engine/items.js';
+import { slotKeys, touchSlot, clearSlot, isValidSlot } from './saveSlots.js';
+import { sellPrice } from '../engine/shop.js';
 
-const STORAGE_KEYS = {
-  party: 'mrg_party',
-  clearedDungeons: 'mrg_cleared_dungeons',
-  inventory: 'mrg_inventory',
-  owned: 'mrg_owned',
-  discovered: 'mrg_discovered',
-  gold: 'mrg_gold',
-};
+// v0.7 まで、保存先は 'mrg_owned' のような決め打ちのキーだった。
+// セーブ枠(3本)が入ったので、キーは枠ごとに変わる。どのキーになるかは
+// state/saveSlots.js が決める。ここから下は「渡された枠のキー一式に書く」
+// だけで、枠がいくつあるかを知らない。
+//
+// 枠を切り替えるときは App が GameStoreProvider ごと作り直す(key={slot})。
+// 同時に2つの枠が開くことはないので、モジュール変数で持って構わない。
+let STORAGE_KEYS = slotKeys(1);
+let ACTIVE_SLOT = 1;
+
+function useSlot(slot) {
+  const n = isValidSlot(slot) ? slot : 1;
+  if (n === ACTIVE_SLOT && STORAGE_KEYS) return;
+  ACTIVE_SLOT = n;
+  STORAGE_KEYS = slotKeys(n);
+}
 
 const PARTY_LIMIT = 3;
 
@@ -136,14 +146,18 @@ function initialParty(owned) {
 
 const GameStoreContext = createContext(null);
 
-export function GameStoreProvider({ children }) {
+export function GameStoreProvider({ children, slot = 1 }) {
+  // useState の初期化子より先に走らせる必要がある(初期化子が
+  // STORAGE_KEYS を読むため)。描画のたびに呼ばれるが、同じ枠なら何もしない。
+  useSlot(slot);
+
   const [owned, setOwned] = useState(initialOwned);
   const [party, setPartyState] = useState(() => initialParty(owned));
   const [discovered, setDiscovered] = useState(() => loadJson(STORAGE_KEYS.discovered, []));
   const [clearedDungeons, setClearedDungeons] = useState(() => loadJson(STORAGE_KEYS.clearedDungeons, []));
   const [inventory, setInventory] = useState(initialInventory);
   // 所持金。v0.6 で宝箱が「大金」をくれるようになって初めて意味を持った。
-  // 使い道(どうぐ屋の売り買い)はまだ無い — お金だけ先に流れるようにしてある。
+  // 使い道は どうぐ屋の売り買い (components/Town/ItemShop.jsx)。
   const [gold, setGoldState] = useState(() => {
     const stored = Number(loadJson(STORAGE_KEYS.gold, STARTING_GOLD));
     return Number.isFinite(stored) ? Math.max(0, Math.floor(stored)) : STARTING_GOLD;
@@ -172,6 +186,14 @@ export function GameStoreProvider({ children }) {
   useEffect(() => saveJson(STORAGE_KEYS.clearedDungeons, clearedDungeons), [clearedDungeons]);
   useEffect(() => saveJson(STORAGE_KEYS.inventory, inventory), [inventory]);
   useEffect(() => saveJson(STORAGE_KEYS.gold, gold), [gold]);
+
+  // 「最後に遊んだ日時」。タイトル画面のカードに出す。
+  // 中身がまだ無い枠(開始イベントの前)には印を押さない — 押すと
+  // 一覧で「データが ありません」なのに日付だけ出てしまう。
+  useEffect(() => {
+    if (suppressSave.current || owned.length === 0) return;
+    touchSlot(ACTIVE_SLOT);
+  }, [owned, party, clearedDungeons, inventory, gold, discovered]);
 
   // roster は図鑑・敵データ参照用の全モンスター。プレイヤーが使えるのは owned だけ。
   const roster = monsters;
@@ -249,6 +271,68 @@ export function GameStoreProvider({ children }) {
     goldRef.current = total;
     setGoldState(total);
     return { ok: true, amount: add, total, message: `${formatGold(add)} ゴールドを 手に入れた！` };
+  }
+
+  /**
+   * どうぐ屋で買う。
+   * ゴールドとふくろは **同時に動かないといけない**。先に払ってから
+   * ふくろが満杯だと気づくと、金だけ消える。なので入る数を先に確かめて、
+   * 実際に入ったぶんの代金だけ払う。
+   * @returns {{ok:boolean, added:number, spent:number, message:string}}
+   */
+  function buyItem(itemId, count = 1) {
+    const item = ITEM_BY_ID[itemId];
+    const want = Math.max(1, Math.floor(count));
+    if (!item) return { ok: false, added: 0, spent: 0, message: 'それは 置いていません。' };
+    const unit = Math.max(0, Math.floor(item.price || 0));
+    if (unit <= 0) return { ok: false, added: 0, spent: 0, message: `${item.name} は 売り物では ありません。` };
+
+    // 買える数 = 財布で足りる数。1コも買えないならそう言う。
+    const affordable = Math.min(want, Math.floor(goldRef.current / unit));
+    if (affordable <= 0) {
+      return {
+        ok: false, added: 0, spent: 0,
+        message: `ゴールドが たりません。（${item.name} は ${formatGold(unit)}G）`,
+      };
+    }
+
+    const result = addToInventory(inventoryRef.current, itemId, affordable);
+    if (result.added <= 0) {
+      // ふくろが満杯 / 99コ上限。addToInventory の理由をそのまま見せる。
+      return { ok: false, added: 0, spent: 0, message: result.message };
+    }
+    const spent = unit * result.added;
+    inventoryRef.current = result.inventory;
+    setInventory(result.inventory);
+    goldRef.current = Math.max(0, goldRef.current - spent);
+    setGoldState(goldRef.current);
+
+    const short = affordable < want ? '（ゴールドの ぶんだけ）' : '';
+    return {
+      ok: true, added: result.added, spent,
+      message: `${item.name} を ${result.added}コ 買った！${short} −${formatGold(spent)}G`,
+    };
+  }
+
+  /**
+   * どうぐ屋で売る。売値は買値の半分 (engine/shop.js)。
+   * @returns {{ok:boolean, sold:number, gained:number, message:string}}
+   */
+  function sellItem(itemId, count = 1) {
+    const item = ITEM_BY_ID[itemId];
+    const have = inventoryRef.current[itemId] || 0;
+    if (!item || have <= 0) return { ok: false, sold: 0, gained: 0, message: 'それは 持っていません。' };
+    const sold = Math.max(1, Math.min(Math.floor(count), have));
+    const gained = sellPrice(item) * sold;
+
+    inventoryRef.current = removeFromInventory(inventoryRef.current, itemId, sold);
+    setInventory(inventoryRef.current);
+    goldRef.current = Math.min(GOLD_LIMIT, goldRef.current + gained);
+    setGoldState(goldRef.current);
+    return {
+      ok: true, sold, gained,
+      message: `${item.name} を ${sold}コ 売った！ ＋${formatGold(gained)}G`,
+    };
   }
 
   /** デバッグ: ふくろを空にする。 */
@@ -460,13 +544,24 @@ export function GameStoreProvider({ children }) {
 
   /**
    * 戦闘結果を反映する。
-   * @param {object} outcome { instances: 更新済み個体クローン[], recruits: 種族id[] }
+   * recruits に入っているのは「プレイヤーが なかまにする を選んだ子」だけ。
+   * 見送った子は結果画面(BattleResult.jsx)で捨てられ、ここまで来ない。
+   *
+   * パーティーに空きがあれば、その場で連れ歩けるようにする。
+   * 牧場まで取りに戻らせるのは、せっかく仲間になった直後の手続きとして重い。
+   * 空きが無いぶんは牧場に残る(結果画面がそう伝えている)。
+   * @param {object} outcome { instances: 更新済み個体クローン[], recruits: {id,level}[] }
    */
   function applyBattleOutcome(outcome) {
     if (!outcome) return;
     replaceInstances(outcome.instances);
     if (outcome.recruits && outcome.recruits.length > 0) {
-      acquireMany(outcome.recruits);
+      const created = acquireMany(outcome.recruits);
+      setPartyState((prev) => {
+        const room = PARTY_LIMIT - prev.length;
+        if (room <= 0) return prev;
+        return [...prev, ...created.slice(0, room).map((inst) => inst.uid)];
+      });
     }
   }
 
@@ -491,16 +586,19 @@ export function GameStoreProvider({ children }) {
     return child;
   }
 
-  /** デバッグ: セーブを初期化して開始イベントからやり直す。 */
+  /**
+   * デバッグ: いま開いている枠を空にして、タイトル画面へ戻る。
+   * 消すのは **この枠だけ**。他の枠のセーブには触らない。
+   * (再読み込みするとアプリはタイトルから始まるので、それで戻る)
+   */
   function resetSave() {
     suppressSave.current = true;
-    try {
-      Object.values(STORAGE_KEYS).forEach((k) => localStorage.removeItem(k));
-    } catch (e) { /* noop */ }
+    clearSlot(ACTIVE_SLOT);
     window.location.reload();
   }
 
   const value = {
+    activeSlot: ACTIVE_SLOT,
     roster,
     rosterById,
     skillsById: SKILLS_BY_ID,
@@ -532,6 +630,8 @@ export function GameStoreProvider({ children }) {
     acquireItem,
     gold,
     addGold,
+    buyItem,
+    sellItem,
     emptyBag,
     useItemInTown,
     bagSlotLimit: BAG_SLOT_LIMIT,

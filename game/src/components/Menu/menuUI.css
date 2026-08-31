@@ -186,6 +186,123 @@
   color: #c9a870;
 }
 
+/* --- とくぎの札 (FieldMenu.jsx の SkillCard) ------------------------------
+ * とくぎ1本を「名前 / 要点の札 / 説明文」の3段で出す。
+ *
+ * ここだけ .jrpg-win を使っていないのは、詳細の段には技が何本も縦に並ぶから。
+ * 金の枠を1本ずつに付けると枠だらけになって、かえって区切りが読めなくなる。
+ * 代わりに「左に1本の縦線 + 黒く沈めた地」だけにして、.mnu-notice と
+ * 同じ作り方でそろえてある。枠の金は上の見出し(.mnu-sub)が持つ。
+ *
+ * 幅はスマホ横(844x390)の詳細の段 = だいたい 250px しかない。
+ * 名前も説明文も折り返す前提で組む(ellipsis で切ると説明が読めない)。
+ */
+
+.mnu-skill {
+  background: rgba(0, 0, 0, 0.28);
+  border-left: 2px solid var(--gold-dim);
+  border-radius: 2px;
+  padding: clamp(3px, 0.8vh, 7px) clamp(5px, 1vw, 9px);
+  margin-bottom: clamp(3px, 0.7vh, 6px);
+}
+
+/* 1行目。名前は左、但し書き(「Lv n で おぼえる」)は右肩。
+   名前が長いときは但し書きを下へ落とす — 但し書きを削るより折り返すほうがよい。 */
+.mnu-skillhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px clamp(4px, 0.8vw, 8px);
+}
+
+.mnu-skillname {
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  color: var(--ink-gold);
+  line-height: 1.25;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+  /* min-width が肝。basis 0 のまま横に並べると、但し書きに幅を取られて
+     名前が 6文字ぶんまで痩せ、「のろいのつめ（ラン / ク1）」のように
+     カッコの途中で折れる。ここで「名前にはこれだけ要る」を宣言しておくと、
+     足りないときは但し書きのほうが次の行へ落ちる(下の margin-left:auto で
+     落ちた先でも右そろえのまま)。 */
+  flex: 1 1 auto;
+  min-width: 9em;
+}
+
+.mnu-skillnote {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: var(--fs-xs);
+  color: var(--ink-warn);
+  white-space: nowrap;
+}
+
+/* 2行目。要点(種別・属性 / 威力 / MP / 対象)を小さい札で並べる。
+   engine/skills.js の skillFacts() が中身を決める。 */
+.mnu-skillfacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: clamp(2px, 0.5vh, 4px) 0;
+}
+
+.mnu-skillfacts i {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-size: clamp(10px, 2.1vh, 13px);
+  line-height: 1.35;
+  color: #dfe6f6;
+  background: linear-gradient(180deg, var(--btn-b), var(--btn-c));
+  border: 1px solid rgba(139, 151, 189, 0.7);
+  border-radius: 2px;
+  padding: 0 clamp(3px, 0.6vw, 6px);
+  white-space: nowrap;
+}
+
+/* 3行目。skills.json の説明文。ここが読めることが札の目的なので、
+   本文の色(--ink)のまま出す。行間はやや広め。 */
+.mnu-skilldesc {
+  font-size: var(--fs-xs);
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+/* --- まだ 覚えていない技(継承わく) ---------------------------------------
+ * 「今は使えない」を出すために暗くするが、**説明文は読ませる**。
+ * 何を覚えるのか分からないと、継承わくを見に来た意味がない。
+ * そこで暗くするのは枠と名前だけにして、説明文は本文のまま残す。
+ * 色だけだと区別がつきにくいので、名前の頭に鍵の印を足す。
+ */
+
+.mnu-skill--inherit {
+  background: rgba(0, 0, 0, 0.34);
+  border-left-color: rgba(230, 185, 114, 0.55);
+  border-left-style: dashed;
+}
+
+.mnu-skill--inherit .mnu-skillname {
+  color: #e6b972;
+}
+
+.mnu-skill--inherit .mnu-skillname::before {
+  content: '🔒';
+  font-size: 0.8em;
+  margin-right: 0.3em;
+  vertical-align: 0.05em;
+}
+
+.mnu-skill--inherit .mnu-skillfacts i {
+  color: var(--ink-dim);
+  background: linear-gradient(180deg, #262c40, #191d2c);
+  border-color: rgba(139, 151, 189, 0.45);
+}
+
+.mnu-skill--inherit .mnu-skilldesc {
+  color: #e3e0d6;
+}
+
 /* 個体の見出し(絵 + 名前 + 種族/★/Lv)。 */
 .mnu-idhead {
   display: flex;
@@ -226,7 +343,7 @@
   display: flex;
   justify-content: space-between;
   gap: 6px;
-  border-bottom: 1px dotted rgba(255, 255, 255, 0.12);
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.2);
 }
 
 .mnu-stat b {
@@ -235,7 +352,7 @@
 }
 
 .mnu-stat i {
-  color: #7f879c;
+  color: var(--ink-faint);
   font-style: normal;
   font-size: 0.88em;
 }
@@ -335,7 +452,7 @@
 
 /* 記録の無い親。木の形を保つために席だけ置く。 */
 .mnu-treecard--unknown {
-  color: #6f778c;
+  color: var(--ink-faint);
 }
 
 .mnu-notice {
@@ -357,8 +474,8 @@
 .mnu-keys {
   flex: 0 0 auto;
   margin-top: clamp(3px, 0.7vh, 6px);
-  font-size: clamp(9px, 1.9vh, 12px);
-  color: #767e93;
+  font-size: clamp(10px, 2.1vh, 13px);
+  color: var(--ink-faint);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

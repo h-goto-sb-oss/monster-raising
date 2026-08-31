@@ -43,7 +43,31 @@ export const MAX_LEARNED_SKILLS = 10;
  * ダンジョン12本の推奨レベルを引き直すこと(あちらの検証がここまで見ている)。
  */
 export const LEVEL_CURVE_POWER = 2.0;
+export const LEVEL_CURVE_COEF = 6;
 export const EXP_LEVEL_POWER = 1.1;
+
+/**
+ * 必要経験値の下駄 (2026-08-31 追加)。
+ *
+ * 「初めての相手を倒すとレベルが3になるのも気になる」(博史さん)。
+ * 下駄なしの 6 x レベル^2 だと Lv1->2 が 6、Lv2->3 が 24 で、合わせて 30。
+ * はじまりの草原の雑魚1体が 42 の経験値をくれるので、**1匹倒しただけで
+ * 2レベル上がってしまう**。曲線の形の問題ではなく、低レベル側の値が
+ * 小さすぎるだけ (Lv20 では 6 x 400 = 2400 で、下駄の有無は誤差)。
+ *
+ * そこで曲線そのものは触らず、全レベルに一定の下駄をはかせる。
+ *   必要経験値 = (6 x レベル^2 + 30) x ★倍率
+ * 序盤にだけ効いて、中盤以降の「1レベルあたりの戦闘数」は変わらない。
+ * 敵側 (enemyExpValue) は 1 も動かしていない — 敵を弱らせると
+ * 「深く潜る意味」まで一緒に薄まるので、触るのは必要経験値だけにした。
+ *
+ * 30 にした根拠 (build_dungeons.py の経験値シミュレーションで確認):
+ *   雑魚1体(42exp) …… 1匹目で Lv2、3匹目で Lv3   (以前は 1匹目で Lv3)
+ *   はじまりの草原1周 … Lv4                       (以前は Lv5)
+ *   12本を1周ずつ …… 最終 Lv58                    (以前と同じ)
+ *   12本すべてで「1周すれば次のダンジョンの推奨レベルに届く」も維持。
+ */
+export const LEVEL_CURVE_BASE = 30;
 
 /**
  * 敵の個体値。敵に個体差は持たせないので中央値(15)固定。
@@ -56,7 +80,9 @@ export const ENEMY_IV = { hp: 15, mp: 15, atk: 15, def: 15, int: 15, spd: 15 };
 export function expToNextLevel(level, star) {
   if (level >= MAX_LEVEL) return Infinity;
   const factor = STAR_EXP_FACTOR[star] ?? 1.0;
-  return Math.round(6 * Math.pow(level, LEVEL_CURVE_POWER) * factor);
+  return Math.round(
+    (LEVEL_CURVE_COEF * Math.pow(level, LEVEL_CURVE_POWER) + LEVEL_CURVE_BASE) * factor,
+  );
 }
 
 /**
@@ -132,14 +158,31 @@ export function recalcStats(instance, species) {
  * - 種族の learnset から learnLevel 以下のものを覚える
  * - 継承枠(inherited)も learnLevel に達したら learned へ移す = 「習得予約」の解禁
  * - 同系統(line)の上位を覚えたら下位を上書きする (仕様書7項)
+ *
+ * 技が10コで いっぱいのとき:
+ *   仕様書7項は「11個目を覚えるときは 消すものを選ぶ」としているが、
+ *   その選ばせる画面はまだ無い。いまは **覚えない** で止める。
+ *   ただし黙って止めない — 覚えられなかったことをログに出す。
+ *   以前はここが完全に無言だったので、レベルが上がっても技が増えない理由が
+ *   プレイヤーからは分からなかった。
+ *
+ *   継承枠(inherited)は、覚えられなかったら **枠に残す**。
+ *   以前は「レベルに達したら inherited から外す」を先にやっていたので、
+ *   満杯のときに継承技が消えてしまい、二度と覚えられなくなっていた。
+ *
+ * @param {number} fromLevel このレベルより後に覚えるはずだった技だけ「覚えられ
+ *   なかった」と伝える。毎レベルアップで同じ苦情を繰り返さないため。
  * @returns {string[]} 覚えた技の名前ログ
  */
-export function applySkillLearning(instance, species, skillsById) {
+export function applySkillLearning(instance, species, skillsById, fromLevel = 0) {
   const logs = [];
-  const learn = (skillId) => {
+  /** 満杯で覚えられなかった技の名前。まとめて最後に1行だけ出す。 */
+  const blocked = [];
+  /** @returns {boolean} learned に入った(またはもう用済み)なら true */
+  const learn = (skillId, dueLevel = 0) => {
     const skill = skillsById[skillId];
-    if (!skill) return;
-    if (instance.learned.includes(skillId)) return;
+    if (!skill) return true;
+    if (instance.learned.includes(skillId)) return true;
 
     // 同系統の下位呪文は上書きして消す
     if (skill.line) {
@@ -155,27 +198,44 @@ export function applySkillLearning(instance, species, skillsById) {
         const s = skillsById[id];
         return s && s.line === skill.line && (s.rank ?? 1) > (skill.rank ?? 1);
       })) {
-        // 既に上位を覚えているので下位は覚えない
-        return;
+        // 既に上位を覚えているので下位は覚えない(枠から外してよい)
+        return true;
       }
     }
 
-    if (instance.learned.length >= MAX_LEARNED_SKILLS) return;
+    if (instance.learned.length >= MAX_LEARNED_SKILLS) {
+      // 今回のレベルアップで来たぶんだけ知らせる。前から覚えられていない技を
+      // レベルが上がるたびに読ませても、同じ文が並ぶだけで読み飛ばされる。
+      if (dueLevel > fromLevel) blocked.push(skill.name);
+      return false;
+    }
     instance.learned.push(skillId);
     if (logs.length === 0 || !logs[logs.length - 1].includes(skill.name)) {
       logs.push(`${skill.name} を おぼえた！`);
     }
+    return true;
   };
 
   (species.learnset || [])
     .filter((e) => e.level <= instance.level)
     .sort((a, b) => a.level - b.level)
-    .forEach((e) => learn(e.skillId));
+    .forEach((e) => learn(e.skillId, e.level));
 
   const due = (instance.inherited || []).filter((e) => e.learnLevel <= instance.level);
   if (due.length > 0) {
-    instance.inherited = instance.inherited.filter((e) => e.learnLevel > instance.level);
-    due.sort((a, b) => a.learnLevel - b.learnLevel).forEach((e) => learn(e.skillId));
+    due.sort((a, b) => a.learnLevel - b.learnLevel);
+    // 覚えられなかったものは継承枠に残す。外してしまうと二度と覚えられない。
+    const stillPending = due.filter((e) => !learn(e.skillId, e.learnLevel));
+    instance.inherited = [
+      ...(instance.inherited || []).filter((e) => e.learnLevel > instance.level),
+      ...stillPending,
+    ];
+  }
+
+  if (blocked.length > 0) {
+    logs.push(
+      `とくぎを ${MAX_LEARNED_SKILLS}コ おぼえている！ ${blocked.join('・')} は おぼえられなかった。`,
+    );
   }
 
   return logs;
@@ -197,6 +257,8 @@ export function gainExp(instance, species, amount, skillsById, displayName) {
   instance.exp = (instance.exp || 0) + amount;
   logs.push(`${name} は ${amount} の経験値を かくとくした！`);
 
+  // 「覚えられなかった」を知らせるのは、この戦闘で越えたレベルのぶんだけ。
+  const levelBefore = instance.level;
   let gained = 0;
   let guard = 0;
   while (instance.level < MAX_LEVEL && guard < 200) {
@@ -211,7 +273,8 @@ export function gainExp(instance, species, amount, skillsById, displayName) {
   if (gained > 0) {
     recalcStats(instance, species);
     logs.push(`${name} は レベル ${instance.level} に あがった！`);
-    applySkillLearning(instance, species, skillsById).forEach((l) => logs.push(`${name} は ${l}`));
+    applySkillLearning(instance, species, skillsById, levelBefore)
+      .forEach((l) => logs.push(`${name} は ${l}`));
   }
   if (instance.level >= MAX_LEVEL) instance.exp = 0;
 

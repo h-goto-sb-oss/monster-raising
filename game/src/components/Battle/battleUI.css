@@ -407,10 +407,15 @@ html.mrg-battle-lock body {
   text-shadow: 0 3px 0 rgba(0, 0, 0, 0.85);
 }
 
+/* 結果は1ページずつ送る (BattleResult.jsx)。
+ * 1ページは最大4行と決まっているので、枠の高さもそのぶんで固定する。
+ * 1行のページと4行のページで高さが変わると、送るたびにボタンが上下に動いて
+ * 連打しづらい。min-height で「4行ぶん + 内側の余白」を先に確保しておく。 */
 .mrg-result-log {
   text-align: left;
   font-size: var(--fs-sm);
   line-height: 1.55;
+  min-height: calc(var(--fs-sm) * 1.55 * 4 + clamp(10px, 2.4vh, 24px));
   max-height: clamp(76px, 34vh, 240px);
   overflow-y: auto;
   background: rgba(6, 8, 16, 0.72);
@@ -418,4 +423,69 @@ html.mrg-battle-lock body {
   border-radius: 3px;
   padding: clamp(5px, 1.2vh, 12px);
   margin-bottom: clamp(7px, 1.6vh, 16px);
+}
+
+/* 出るときだけ、ほんの少し右から差し込む。
+ * 次の行は55msで来るので、待たされる長さにはならない。 */
+.mrg-result-line {
+  animation: mrg-result-line-in 110ms ease-out both;
+}
+
+@keyframes mrg-result-line-in {
+  from { opacity: 0; transform: translateX(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mrg-result-line { animation: none; }
+}
+
+.mrg-result-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(6px, 1.5vw, 14px);
+}
+
+/* 残りページの目印。押す前に「あと何回か」が分かる。 */
+.mrg-result-dots {
+  display: flex;
+  gap: clamp(3px, 0.6vw, 6px);
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+}
+
+.mrg-result-dot {
+  width: clamp(5px, 1vh, 8px);
+  height: clamp(5px, 1vh, 8px);
+  border-radius: 50%;
+  background: rgba(201, 177, 131, 0.28);
+  border: 1px solid rgba(201, 177, 131, 0.5);
+}
+
+.mrg-result-dot.is-done { background: rgba(201, 177, 131, 0.6); }
+.mrg-result-dot.is-now { background: #f2d16b; border-color: #f2d16b; }
+
+.mrg-result-next {
+  flex: 0 0 auto;
+  min-width: clamp(96px, 22vw, 170px);
+  /* 長押しで文字の選択が始まると押し続けられなくなる。連射のために殺す。 */
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* 野生の誘いへの返事 (BattleResult.jsx)。
+ * 「なかまにする」は送るボタンと同じ右端。連打で進めてきた指がそのまま当たる。
+ * 「みおくる」は左端に離す。狙って押したときだけ当たってほしい。 */
+.mrg-result-foot--choice {
+  justify-content: space-between;
+}
+
+.mrg-result-let-go {
+  flex: 0 0 auto;
+  min-width: clamp(76px, 18vw, 130px);
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }

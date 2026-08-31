@@ -26,7 +26,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import { BattleEngine, PHASE, RESULT } from '../../engine/battle/BattleEngine.js';
+import { BattleEngine, PHASE } from '../../engine/battle/BattleEngine.js';
 import { BattleScene } from '../../scenes/BattleScene.js';
 import skillsRaw from '../../data/skills.json';
 import BattleMenu from './BattleMenu.jsx';
@@ -34,7 +34,9 @@ import AttackSubmenu from './AttackSubmenu.jsx';
 import SkillList from './SkillList.jsx';
 import ItemMenu from './ItemMenu.jsx';
 import TacticsMenu from './TacticsMenu.jsx';
+import { TACTICS } from '../../engine/battle/ai.js';
 import PartyStatusBar from './PartyStatusBar.jsx';
+import BattleResult from './BattleResult.jsx';
 import { useGameStore } from '../../state/gameStore.js';
 import { TARGET, targetsAllySide, needsTargetPick, targetsDownedAlly } from '../../engine/skills.js';
 import { itemTargetKind, targetsDownedAlly as itemTargetsDowned } from '../../engine/items.js';
@@ -85,7 +87,13 @@ const STAGE = {
 const TARGET_STAGES = [STAGE.TARGET_ENEMY_FOR_ATTACK, STAGE.TARGET_FOR_SKILL, STAGE.TARGET_FOR_ITEM];
 
 export default function BattleScreen({ playerEntries, enemyEntries, onFinish, background, headerLabel }) {
-  const { inventory, items, consumeItem, bagUsedSlots, bagSlotLimit } = useGameStore();
+  const {
+    inventory, items, consumeItem, bagUsedSlots, bagSlotLimit, party, partyLimit,
+  } = useGameStore();
+
+  // 野生を仲間にしたとき、そのままパーティーへ入れられるか。
+  // 空きが無ければ牧場行きだと結果画面に書かせる (BattleResult.jsx)。
+  const partyFreeSlots = Math.max(0, partyLimit - party.length);
 
   const engineRef = useRef(null);
   if (!engineRef.current) {
@@ -223,17 +231,44 @@ export default function BattleScreen({ playerEntries, enemyEntries, onFinish, ba
     } else resetToMain();
   }
 
+  /**
+   * ターンを解決して、そのターンに起きた演出をキャンバスへ流す。
+   *
+   * 順番が肝心: **先に engine.resolveTurn() を最後まで走らせてから**、
+   * 溜まった記録を絵にする。演出はターンの結果を待たせない
+   * (絵が読めていなくても、シーンがまだ出来ていなくても、
+   *  戦闘の進行はここまでで既に終わっている)。
+   */
+  function resolveTurnWithFx() {
+    engine.resolveTurn();
+    const fx = engine.takeFx();
+    try {
+      sceneRef.current?.playFx(fx);
+    } catch {
+      // 演出でこけても戦闘は続ける。ここが戦闘を壊す道になってはいけない。
+    }
+  }
+
   function submitAction(action) {
     engine.setPlayerAction(currentActor.instanceId, action);
     resetToMain();
     if (engine.allActionsReady()) {
-      engine.resolveTurn();
+      resolveTurnWithFx();
     }
     rerender();
   }
 
   function handleMainSelect(cmdId) {
-    if (cmdId === 'attack') setStage(STAGE.ATTACK_SUB);
+    if (cmdId === 'attack') {
+      // さくせんを設定している子は、こうげき/とくぎ/ぼうぎょ を選ばせずに
+      // さくせんAIに任せる。中身が決まるのは resolveTurn の直前なので、
+      // ここでは「さくせんで動く」という枠だけを積む。
+      // (コマンド欄そのものは出したままにしてある。以前はさくせんを
+      //  設定するとコマンドが出なくなり、どうぐ・にげる・さくせんの変更が
+      //  まとめて封じられていた)
+      if (currentActor.tactic) submitAction({ command: 'tactic' });
+      else setStage(STAGE.ATTACK_SUB);
+    }
     else if (cmdId === 'item') setStage(STAGE.ITEM_MENU);
     else if (cmdId === 'tactics') setStage(STAGE.TACTICS);
     else if (cmdId === 'flee') {
@@ -241,7 +276,7 @@ export default function BattleScreen({ playerEntries, enemyEntries, onFinish, ba
       // 選ばせず、そのまま逃走判定へ進む。
       engine.requestPartyFlee(currentActor.instanceId);
       resetToMain();
-      engine.resolveTurn();
+      resolveTurnWithFx();
       rerender();
     }
   }
@@ -287,14 +322,23 @@ export default function BattleScreen({ playerEntries, enemyEntries, onFinish, ba
     submitAction({ command: 'item', item: selectedItem, targetId });
   }
 
+  /**
+   * さくせんを変える。パーティー全体に効く(TacticsMenu の見出しどおり)。
+   *
+   * 変えたあとは コマンド選択の頭へ戻すだけで、ターンは進めない。
+   * 「さくせんを変えて、そのターンはどうぐで回復する」ができないと、
+   * 作戦変更が事実上できないのと同じになる。
+   *
+   * 積みかけの行動は捨てる。さくせんを変える前に押した「たたかう」は
+   * 古いさくせんで動くので、変えたつもりの1ターンだけ前の作戦で
+   * 殴ることになってしまう。
+   */
   function handleTacticsSelect(tacticId) {
     engine.playerParty.forEach((c) => {
       c.tactic = tacticId;
     });
+    engine.clearPendingActions();
     resetToMain();
-    if (engine.allActionsReady()) {
-      engine.resolveTurn();
-    }
     rerender();
   }
 
@@ -424,7 +468,11 @@ export default function BattleScreen({ playerEntries, enemyEntries, onFinish, ba
         <div className="mrg-cmd jrpg-win" ref={cmdBoxRef}>
           <div className="mrg-cmd-body">
             {currentActor && stage === STAGE.MAIN && (
-              <BattleMenu actorName={currentActor.name} onSelect={handleMainSelect} />
+              <BattleMenu
+                actorName={currentActor.name}
+                tacticLabel={TACTICS[currentActor.tactic]?.label || null}
+                onSelect={handleMainSelect}
+              />
             )}
             {currentActor && stage === STAGE.ATTACK_SUB && (
               <AttackSubmenu onSelect={handleAttackSub} onBack={resetToMain} />
@@ -460,16 +508,19 @@ export default function BattleScreen({ playerEntries, enemyEntries, onFinish, ba
                 </button>
               </>
             )}
+            {/* 生きている全員のコマンドが揃うと submitAction がその場で
+                ターンを進めるので、ふつうはここへ来ない。
+                想定外で入力先を見失ったときに、行き止まりにしないための逃げ道。 */}
             {!currentActor && (
               <>
                 <div className="mrg-note" style={{ marginBottom: 6 }}>
-                  パーティー全員が「さくせん」中です。
+                  全員の こうどうが きまりました。
                 </div>
                 <button
                   className="jrpg-btn jrpg-btn--primary"
                   style={{ width: '100%' }}
                   onClick={() => {
-                    engine.resolveTurn();
+                    resolveTurnWithFx();
                     rerender();
                   }}
                 >
@@ -481,35 +532,19 @@ export default function BattleScreen({ playerEntries, enemyEntries, onFinish, ba
         </div>
       )}
 
+      {/* 結果は「意味ごとに区切ったページ」を1枚ずつ送って読ませる。
+          ページ割りは BattleEngine が作る(_finishBattle)。 */}
       {battleOver && (
-        <div className="mrg-result-wrap">
-          <div className="mrg-result jrpg-win jrpg-scroll">
-            <h2>
-              {state.result === RESULT.WIN && '勝利した！'}
-              {state.result === RESULT.LOSE && '全滅してしまった…'}
-              {state.result === RESULT.FLED && 'にげだした。'}
-            </h2>
-            {/* 経験値・レベルアップ・仲間化のログは末尾に積まれるので、開いた時点で最下部を見せる */}
-            <div
-              className="mrg-result-log"
-              ref={(el) => {
-                if (el) el.scrollTop = el.scrollHeight;
-              }}
-            >
-              {state.log.slice(-10).map((entry, i) => (
-                <div key={i} style={{ color: logColor(entry.text) }}>
-                  {entry.text}
-                </div>
-              ))}
-            </div>
-            <button
-              className="jrpg-btn jrpg-btn--primary"
-              onClick={() => onFinish(state.result, engine.getRewards())}
-            >
-              つづける
-            </button>
-          </div>
-        </div>
+        <BattleResult
+          result={state.result}
+          pages={state.resultPages}
+          partyFreeSlots={partyFreeSlots}
+          onFinish={(keptRecruits) => onFinish(state.result, {
+            ...engine.getRewards(),
+            // 誘いを受けた子だけが所持に入る。見送った子はどこにも残らない。
+            recruits: keptRecruits || [],
+          })}
+        />
       )}
     </div>
   );
