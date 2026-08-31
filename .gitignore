@@ -11,6 +11,14 @@ __pycache__/
 # 遊ぶだけ・手を入れるだけならこれは要らない。手元のPCにだけ残しておく。
 monster_project/step1_normalized/
 
+# ChatGPTからの生の納品物一式(2026-08時点で約210MB)。使う分は検品して
+# game/public/assets/ へ取り込み済みなので、遊ぶ・手を入れるだけなら要らない。
+monster_project/incoming/
+
+# タイトル絵を発注したときの参考画像(看板)。実際に使うのは
+# game/public/assets/ui/title.png のみ。
+title_monsters/
+
 # 画像をbase64で焼き込んだ確認用の一枚ページ (1枚35MB前後)。
 # monster_project/build_*.py で作り直せるので置かない。
 monster_project/*.html
