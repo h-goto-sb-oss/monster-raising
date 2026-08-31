@@ -18,6 +18,7 @@ import { GameStoreProvider, useGameStore, formatGold } from './state/gameStore.j
 import FieldScreen from './components/Field/FieldScreen.jsx';
 import ItemIcon from './components/Common/ItemIcon.jsx';
 import FacilityPlaceholder from './components/Town/FacilityPlaceholder.jsx';
+import ItemShop from './components/Town/ItemShop.jsx';
 import MonsterRanch from './components/Town/MonsterRanch.jsx';
 import FusionFacility from './components/Town/FusionFacility.jsx';
 import DungeonSelect from './components/Town/DungeonSelect.jsx';
@@ -27,10 +28,13 @@ import FieldMenu from './components/Menu/FieldMenu.jsx';
 import BattleScreen from './components/Battle/BattleScreen.jsx';
 import StarterEvent from './components/Event/StarterEvent.jsx';
 import DebugMenu from './components/Debug/DebugMenu.jsx';
+import TitleScreen from './components/Title/TitleScreen.jsx';
 import { RESULT } from './engine/battle/BattleEngine.js';
 import { usableInField } from './engine/items.js';
+import { areaOpenedBy } from './engine/areas.js';
 import {
   buildTownMap, buildInteriorMap, buildDungeonFloorMap,
+  buildBossRoomMap, bossRoomFor, bossRoomSpawn,
   interiorInfo, interiorSpawn, townSpawnForDoor,
   TOWN_SPAWN, TOWN_GATE_SPAWN, dungeonFloorSpawn,
 } from './field/maps.js';
@@ -54,9 +58,9 @@ const SCREEN = {
   PRIEST: 'priest',
 };
 
-// 未実装のまま「準備中」パネルを出す施設。配合施設と牧場は実装済み。
+// 未実装のまま「準備中」パネルを出す施設。
+// 配合施設・牧場・どうぐ屋は実装済みなので、ここには残っていない。
 const FACILITY_TITLES = {
-  shop: 'どうぐ屋',
   storage: 'あずけ所',
   church: '教会',
 };
@@ -70,10 +74,12 @@ const FACILITY_ART = {
 
 // 「準備中」ではなく、そういう作りだと伝えたい施設の但し書き。
 const FACILITY_NOTES = {
+  storage:
+    'モンスターは 牧場が 何体でも 預かります（数の 制限は ありません）。'
+    + 'そのため あずけ所には いまのところ 仕事が ありません。',
   church:
     '回復と蘇生は、ダンジョンから帰ってきたときに 司祭が 入口で 行います（教会まで足を運ぶ必要はありません）。'
     + 'この建物では、いずれ 別のサービスを 用意する予定です。',
-  shop: 'どうぐの 売り買いは 次のフェーズで 実装予定です。持ちものの確認と使用は まちの「どうぐ」から行えます。',
 };
 
 /** まちの広場に立った状態。 */
@@ -82,12 +88,14 @@ const TOWN_PLACE = { kind: 'town', spawn: TOWN_SPAWN };
 function AppInner() {
   const {
     rosterById, party, ownedByUid, owned, items, inventory,
+    clearedDungeons,
     markDungeonCleared, applyBattleOutcome, priestBlessing, acquireItem, consumeItem,
     gold, addGold,
   } = useGameStore();
 
   const [screen, setScreen] = useState(SCREEN.FIELD);
-  // いま歩いている場所。{kind:'town'} | {kind:'interior', id} | {kind:'dungeon', floorIndex}
+  // いま歩いている場所。
+  // {kind:'town'} | {kind:'interior', id} | {kind:'dungeon', floorIndex} | {kind:'bossRoom'}
   const [place, setPlace] = useState(TOWN_PLACE);
   const [battleKey, setBattleKey] = useState(0);
   const [pendingBattle, setPendingBattle] = useState(null); // { encounter, isBoss, dungeon, floorIndex }
@@ -101,6 +109,11 @@ function AppInner() {
   // 司祭の処理結果。回復は「画面を出すとき」ではなくここで1回だけ実行する
   // (StrictMode の二重描画でやくそうが2つになるのを避ける)。
   const [priestVisit, setPriestVisit] = useState(null); // { result, report, drops }
+  // 「たった今、新しい土地への道がひらけた」という **できごと**。
+  // 開いているかどうか自体は clearedDungeons から導けるが(engine/areas.js)、
+  // 開いた瞬間だけは状態からは分からない。次に地図を開いたときに祝って、
+  // 見せたら捨てる。保存はしない。
+  const [openedArea, setOpenedArea] = useState(null);
   // 所持が空 = 新規プレイ(旧セーブ破棄を含む)。まず開始イベントへ。
   const [inStarter, setInStarter] = useState(() => owned.length === 0);
 
@@ -120,13 +133,19 @@ function AppInner() {
 
   const fieldMap = useMemo(() => {
     if (place.kind === 'interior') return buildInteriorMap(place.id);
+    if (place.kind === 'bossRoom' && runRef.current) {
+      // ボスの絵は戦闘で使うものと同じ。部屋の主として先に立たせておくので、
+      // 「戦う前にどんな相手か見える」= 逃げるかどうかを決められる。
+      const boss = bossEncounter(runRef.current.dungeon);
+      const lead = boss?.enemies?.[0];
+      const species = lead ? rosterById[lead.id] : null;
+      return buildBossRoomMap(runRef.current.dungeon, species?.spriteUrl || null);
+    }
     if (place.kind === 'dungeon' && runRef.current) {
-      // 開けた宝箱と拾った床のどうぐは走行状態が覚えている。階を行き来しても
-      // 戦闘から戻っても そのままにするため、組み直すたびにここから渡す。
-      return buildDungeonFloorMap(
-        runRef.current.dungeon, place.floorIndex,
-        runRef.current.openedChests, runRef.current.pickedItems,
-      );
+      // 走行状態(run)をそのまま渡す。開けた宝箱・拾った床のどうぐ・
+      // 落ちどうぐの配置を決める種は全部そこにある。階を行き来しても
+      // 戦闘から戻っても同じ配置・同じ開閉状態で組み直される。
+      return buildDungeonFloorMap(runRef.current.dungeon, place.floorIndex, runRef.current);
     }
     return buildTownMap();
   }, [place]);
@@ -236,14 +255,14 @@ function AppInner() {
         if (!run) break;
         const next = run.floorIndex + 1;
         moveToFloor(run, next);
-        setPlace({ kind: 'dungeon', floorIndex: next, spawn: dungeonFloorSpawn(next, 'above') });
+        setPlace({ kind: 'dungeon', floorIndex: next, spawn: dungeonFloorSpawn(run.dungeon, next, 'above') });
         break;
       }
       case 'stairsUp': {
         if (!run) break;
         const prev = Math.max(0, run.floorIndex - 1);
         moveToFloor(run, prev);
-        setPlace({ kind: 'dungeon', floorIndex: prev, spawn: dungeonFloorSpawn(prev, 'below') });
+        setPlace({ kind: 'dungeon', floorIndex: prev, spawn: dungeonFloorSpawn(run.dungeon, prev, 'below') });
         break;
       }
       case 'chest':
@@ -256,10 +275,14 @@ function AppInner() {
         setFieldMessage({
           text: '階段の 下から ただならぬ 気配が する。おりますか？',
           choices: [
-            { label: 'おりる', primary: true, onSelect: () => { setFieldMessage(null); startBoss(); } },
+            { label: 'おりる', primary: true, onSelect: () => { setFieldMessage(null); descendToBoss(); } },
             { label: 'やめる', cancel: true, onSelect: () => setFieldMessage(null) },
           ],
         });
+        break;
+      // ボス部屋で ボスに近づいた(MapScene が毎歩みている)。
+      case 'bossFight':
+        startBoss();
         break;
       default:
         break;
@@ -385,7 +408,7 @@ function AppInner() {
   function startDungeon(dungeon) {
     runRef.current = createRun(dungeon);
     heldEncounterRef.current = null;
-    setPlace({ kind: 'dungeon', floorIndex: 0, spawn: dungeonFloorSpawn(0, 'above') });
+    setPlace({ kind: 'dungeon', floorIndex: 0, spawn: dungeonFloorSpawn(dungeon, 0, 'above') });
     setFieldMessage(null);
     setShowFieldItems(false);
     setMenuOpen(false);
@@ -400,7 +423,10 @@ function AppInner() {
     const run = runRef.current;
     if (!run) return;
     run.pose = poseRef.current;
-    setPendingBattle({ encounter, isBoss, dungeon: run.dungeon, floorIndex: run.floorIndex });
+    setPendingBattle({
+      encounter, isBoss, dungeon: run.dungeon, floorIndex: run.floorIndex,
+      inBossRoom: place.kind === 'bossRoom',
+    });
     setBattleKey((k) => k + 1);
     setMenuOpen(false);
     // 画面を一瞬暗くしてから戦闘へ。いきなり切り替わると何が起きたか分からない。
@@ -409,6 +435,26 @@ function AppInner() {
       setFlash(false);
       setScreen(SCREEN.BATTLE);
     }, 300);
+  }
+
+  /**
+   * 最下層の階段を おりる。
+   *
+   * biome ごとの「ボスの間」があればそこへ入る。部屋の入口に立たされ、
+   * 奥のボスへ2マスまで近づくと戦闘が始まる(MapScene の bossTile 判定)。
+   * 部屋には階段が無いので、入ったら「戦う」か「キメラのつばさで帰る」しかない。
+   *
+   * 専用の部屋を持たない biome は、今までどおり階段の先ですぐ戦闘に入る。
+   */
+  function descendToBoss() {
+    const run = runRef.current;
+    if (!run) return;
+    if (!bossRoomFor(run.dungeon)) {
+      startBoss();
+      return;
+    }
+    setPlace({ kind: 'bossRoom', spawn: bossRoomSpawn(run.dungeon) });
+    setScreen(SCREEN.FIELD);
   }
 
   function startBoss() {
@@ -453,7 +499,10 @@ function AppInner() {
     }
 
     if (info.isBoss && result === RESULT.WIN) {
+      // 踏破を書き込む前に見る。書いたあとでは「前から開いていた」と区別できない。
+      const opened = areaOpenedBy(run.dungeon.id, clearedDungeons);
       markDungeonCleared(run.dungeon.id);
+      if (opened) setOpenedArea(opened);
       const drops = collectClearReward(run.dungeon);
       returnToTownViaPriest(result, drops);
       return;
@@ -468,7 +517,13 @@ function AppInner() {
     // だからこそ「どうぐを持っていくか」「ここで 引き返すか」が意味を持つ。
     resumeAfterBattle(run);
     setPendingBattle(null);
-    setPlace({ kind: 'dungeon', floorIndex: run.floorIndex, spawn: run.pose || place.spawn });
+    if (info.inBossRoom) {
+      // ボスから にげた。元いたマスへ戻すと、ボスの目の前(戦闘が始まる2マス以内)
+      // に立たされて即また戦闘 = 逃げられない。入口へ下がらせる。
+      setPlace({ kind: 'bossRoom', spawn: bossRoomSpawn(run.dungeon) });
+    } else {
+      setPlace({ kind: 'dungeon', floorIndex: run.floorIndex, spawn: run.pose || place.spawn });
+    }
     setScreen(SCREEN.FIELD);
   }
 
@@ -564,10 +619,16 @@ function AppInner() {
   if (screen === SCREEN.RANCH) return <MonsterRanch onBack={backToField} />;
   if (screen === SCREEN.BAG) return <ItemBag onBack={backToField} />;
   if (screen === SCREEN.FUSION) return <FusionFacility onBack={backToField} />;
+  if (screen === SCREEN.SHOP) return <ItemShop onBack={backToField} />;
 
   if (screen === SCREEN.DUNGEON_SELECT) {
     return (
-      <DungeonSelect onStartDungeon={startDungeon} onBack={() => goTown(TOWN_GATE_SPAWN)} />
+      <DungeonSelect
+        onStartDungeon={startDungeon}
+        onBack={() => goTown(TOWN_GATE_SPAWN)}
+        openedArea={openedArea}
+        onOpenedAreaSeen={() => setOpenedArea(null)}
+      />
     );
   }
 
@@ -673,9 +734,24 @@ function AppInner() {
   );
 }
 
+/**
+ * いちばん外側。
+ *
+ * 起動するとまず表紙 (TitleScreen) が出て、遊ぶセーブ枠が決まってから
+ * ゲーム本体を組み立てる。
+ *
+ * key={slot} が要点。枠を変えるということは、保存された値を読み直す
+ * ということなので、GameStoreProvider を **作り直す** 必要がある
+ * (localStorage を読むのは useState の初期化子で、mount のとき1回きり)。
+ */
 export default function App() {
+  // null = まだ枠が決まっていない = 表紙。
+  const [slot, setSlot] = useState(null);
+
+  if (slot == null) return <TitleScreen onPlay={setSlot} />;
+
   return (
-    <GameStoreProvider>
+    <GameStoreProvider key={slot} slot={slot}>
       <AppInner />
       {/* 検証用。本番ビルドでは丸ごと消える。 */}
       {import.meta.env.DEV && <DebugMenu />}

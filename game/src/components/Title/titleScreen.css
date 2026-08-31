@@ -1,0 +1,357 @@
+/* titleScreen.css
+ * 表紙とセーブ枠の一覧。
+ *
+ * 満たすべき条件は2つだけで、どちらも「絵が主役」から来ている。
+ *   1. 絵は全面(フルブリード)。切れるのは端であって、上下の空ではない。
+ *   2. 文字は空の部分に置く。表紙の絵は上半分を空けて描いてもらってある
+ *      (incoming/title/title_wide_1920.png)。
+ *
+ * 大きさは 844x390(スマホ横) と 1280x720 の両方で確かめること。
+ * 数値が clamp だらけなのはそのため — 390px高でも文字が読め、
+ * 720px高でも間延びしないところを 1本の式で通している。
+ */
+
+.ttl {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background: #0a0c16;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 表紙の絵。cover なので、画面の比率が絵(16:9)と違うときは
+   左右か上下が切れる。切るなら空のほう — 足もとを切ると
+   モンスターの脚が無くなって、絵として成立しなくなる。
+   72% = はみ出したぶんの7割を上から削る、の意味。
+   1280x720 は絵と同じ比率なので、そもそも1ピクセルも切れない。 */
+.ttl-art {
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/ui/title.png');
+  background-size: cover;
+  background-position: 50% 72%;
+  background-repeat: no-repeat;
+  /* ドット絵なので拡大は補間なし。にじませると絵の質感が消える。 */
+  image-rendering: pixelated;
+}
+
+/* 空の上のほうだけを落とす下敷き。絵を暗くするためではなく、
+   白と金の文字が明るい青空に溶けないようにするためのもの。
+   下端は透明なので、モンスターと地面には一切かからない。 */
+.ttl-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg,
+      rgba(4, 6, 16, 0.62) 0%,
+      rgba(4, 6, 16, 0.42) 26%,
+      rgba(4, 6, 16, 0.12) 46%,
+      rgba(4, 6, 16, 0) 60%);
+}
+
+/* ------------------------------------------------------------------ 題 */
+
+.ttl-head {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  text-align: center;
+  margin-top: clamp(8px, 3.6vh, 46px);
+  padding: 0 12px;
+}
+
+.ttl-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: normal;
+  /* --fs-xl より一段大きい。表紙の題は画面でいちばん大きい文字でよい。
+     390px高で32px、720px高で60px。 */
+  font-size: clamp(32px, 8.4vh, 60px);
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+  color: #ffeaa7;
+  /* 空は明るいので、色の差だけでは足りない。黒の縁を4方向に置いて
+     形そのものを立たせる(細い縁より、太い影1枚より読みやすい)。 */
+  text-shadow:
+    -2px 0 0 #000, 2px 0 0 #000, 0 -2px 0 #000, 0 2px 0 #000,
+    -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+    0 4px 0 rgba(0, 0, 0, 0.75),
+    0 0 22px rgba(255, 196, 88, 0.45);
+}
+
+.ttl-sub {
+  margin-top: clamp(2px, 0.8vh, 8px);
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.42em;
+  /* letter-spacing は最後の1字の右にも入るので、その分だけ左へ戻す。
+     入れないと中央そろえに見えない。 */
+  text-indent: 0.42em;
+  color: #dfe7ff;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+/* -------------------------------------------------------------- えらぶ */
+
+/* ボタンは横並び。縦に積むと 390px高では空を突き抜けて
+   モンスターに重なる(絵が読めなくなる)。 */
+.ttl-menu {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  margin-top: clamp(15px, 5.2vh, 50px);
+  display: flex;
+  gap: clamp(8px, 2vw, 20px);
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0 12px;
+}
+
+.ttl-btn {
+  /* --fs-md より一回り大きい。表紙は題が 60px まで育つので、
+     ふつうのメニューの字のままだと ボタンが添えものに見える。 */
+  font-size: clamp(15px, 3.6vh, 25px);
+  padding: clamp(7px, 1.9vh, 17px) clamp(14px, 2.8vw, 36px);
+  letter-spacing: 0.04em;
+  /* 絵の上に直に乗るので、ボタンにも黒の外枠を1本足す。 */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 0 0 2px var(--keyline),
+    0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+/* ------------------------------------------------------------ 枠の一覧 */
+
+/* 一覧のときは絵を主役から下げる。カードの文字が最優先。 */
+.ttl--list .ttl-art {
+  filter: brightness(0.5) saturate(0.75);
+}
+
+.ttl-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 8, 18, 0.55);
+}
+
+.ttl-listwrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(6px, 2vh, 20px) clamp(8px, 2vw, 26px);
+  gap: clamp(4px, 1.2vh, 12px);
+}
+
+.ttl-listhead {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ttl-listtitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: normal;
+  font-size: var(--fs-lg);
+  color: var(--ink-gold);
+  letter-spacing: 0.06em;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.85);
+}
+
+/* 3枚を横に並べる。SLOT_COUNT を増やすときはここも見直すこと
+   (4枚以上は 844px幅では1枚が狭すぎる)。 */
+.ttl-slots {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(6px, 1.4vw, 16px);
+  align-items: stretch;
+  /* 縦は「余ったら中央」。1280x720 では枠が伸びきって
+     中身がすかすかになるので、伸びる上限を切ってある。 */
+  align-content: center;
+  /* 100% = 一覧に残っている高さ。狭い画面(844x390)ではそれを使いきり、
+     広い画面では 400px で止める。 */
+  grid-auto-rows: minmax(0, min(100%, 400px));
+}
+
+.ttl-card {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2px, 0.7vh, 7px);
+  padding: clamp(5px, 1.3vh, 13px) clamp(6px, 1vw, 13px);
+  overflow: hidden;
+}
+
+.ttl-card--empty {
+  border-color: var(--gold-dim);
+}
+
+.ttl-card-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.ttl-card-no {
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  color: var(--ink-gold);
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.85);
+}
+
+/* 「けす」。押し間違えると取り返しがつかないので、目立たせない。
+   押したあとに必ず聞き返しが出る。 */
+.ttl-del {
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  color: #e79a8c;
+  background: rgba(80, 26, 26, 0.55);
+  border: 1px solid #7d4040;
+  border-radius: 3px;
+  padding: 1px 7px;
+  line-height: 1.4;
+}
+
+.ttl-del:hover,
+.ttl-del:focus-visible {
+  color: #ffd7cd;
+  border-color: #c47a6a;
+  outline: none;
+}
+
+/* 手持ちの絵。カードの主役なので、縦幅が許すかぎり大きく取る。 */
+.ttl-card-party {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2px, 0.6vw, 8px);
+}
+
+/* 大きさは「カードの余った縦幅いっぱい」。固定px にすると、
+   390px高では小さすぎ、720px高では余白だらけになる。
+   横は3体で3等分を超えないところで止める。 */
+.ttl-card-party img {
+  height: 100%;
+  width: auto;
+  max-width: 31%;
+  max-height: clamp(44px, 17vh, 128px);
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.7));
+}
+
+/* 4つの数を 2x2 に。1行に4つ並べると 844px幅では折り返して高さが暴れる。 */
+.ttl-card-stats {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 clamp(4px, 0.8vw, 10px);
+  font-size: var(--fs-xs);
+  color: #e2e7f4;
+  line-height: 1.5;
+}
+
+.ttl-card-stats span {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.18);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ttl-card-stats i {
+  font-style: normal;
+  color: var(--ink-faint);
+  font-size: 0.9em;
+}
+
+.ttl-card-when {
+  flex: 0 0 auto;
+  font-size: var(--fs-xs);
+  color: var(--ink-faint);
+  text-align: right;
+}
+
+.ttl-card-empty {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--ink-faint);
+  line-height: 1.6;
+}
+
+.ttl-card-go {
+  flex: 0 0 auto;
+  width: 100%;
+  font-size: var(--fs-sm);
+  margin-top: clamp(1px, 0.4vh, 5px);
+}
+
+/* -------------------------------------------------------------- 聞き返し */
+
+.ttl-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(4, 6, 14, 0.72);
+}
+
+.ttl-ask {
+  width: min(460px, 92vw);
+  padding: clamp(8px, 2vh, 18px) clamp(10px, 2vw, 22px);
+}
+
+.ttl-ask-text {
+  margin: 0 0 clamp(6px, 1.6vh, 14px);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.ttl-ask-text b {
+  color: var(--ink-warn);
+}
+
+.ttl-ask-row {
+  display: flex;
+  gap: clamp(6px, 1.4vw, 14px);
+  justify-content: flex-end;
+}
+
+/* 消すほうのボタン。赤にしておいて、押す前に一拍おかせる。 */
+.ttl-btn-danger {
+  background: linear-gradient(180deg, #7a3030 0%, #58201f 52%, #3a1414 100%);
+  border-color: #c8837a;
+  color: #ffe4dd;
+}
+
+.ttl-btn-danger:hover:not(:disabled),
+.ttl-btn-danger:focus-visible {
+  background: linear-gradient(180deg, #943b3b 0%, #6c2827 52%, #481919 100%);
+  border-color: #ffb3a5;
+}
