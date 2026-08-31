@@ -57,8 +57,8 @@ export default function ItemBag({ onBack }) {
         <span className={`bag-chip${bagFull ? ' bag-chip--full' : ''}`}>
           ふくろ {bagUsedSlots}/{bagSlotLimit} スロット{bagFull && '（いっぱい）'}
         </span>
-        {/* 所持金。いまの出どころはダンジョンの宝箱だけで、使い道は
-            どうぐ屋ができてから。持っているのが見えないと稼ぐ意味がない。 */}
+        {/* 所持金。出どころはダンジョンの宝箱と どうぐ屋への売却、
+            使い道は どうぐ屋での買い物。持っているのが見えないと稼ぐ意味がない。 */}
         <span className="bag-chip bag-chip--gold">
           <img src="/assets/ui/gold.png" alt="" />
           {formatGold(gold)} G

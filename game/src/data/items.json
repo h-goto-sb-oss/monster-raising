@@ -329,6 +329,6 @@
     "usableIn": "ダンジョン",
     "target": "なし",
     "price": 20,
-    "icon": null
+    "icon": "/assets/items/item_seisui.png"
   }
 ]
