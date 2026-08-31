@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>モンスター育成ゲーム (プロトタイプ)</title>
 
+    <!-- ホーム画面に追加してアプリとして起動するための宣言。
+         %BASE_URL% は Vite が配信先に置き換える。ローカルは「/」、
+         GitHub Pages は「/monster-raising/」になる。
+         manifest の中身は「./」始まりの相対パスなので、
+         manifest 自身の場所を基準に解決されて両方で正しく通る。 -->
+    <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
+    <meta name="theme-color" content="#0a0c16" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- iPhone は manifest の display を見ないので、こちらで全画面にする。
+         black-translucent + viewport-fit=cover で画面の端まで使い、
+         ノッチのぶんは index.css の safe-area-inset で内側に寄せている。 -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="モンスター育成" />
+    <link rel="apple-touch-icon" href="%BASE_URL%assets/ui/apple-touch-icon-180.png" />
+
     <!-- 書体。ドット絵に合わせて2本立てにしてある (src/index.css の --font-* を参照)。
          DotGothic16         … 見出し・ウィンドウの題・チップ。日本語のビットマップ体で、
                                16px以上でくっきり出る。本文には使わない(小さいと読みにくい)。

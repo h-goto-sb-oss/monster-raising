@@ -93,6 +93,16 @@ body {
   overflow-y: auto;
 }
 
+/* ホーム画面から起動したとき（standalone）は、ブラウザのバーが無くなるぶん
+   ノッチやホームバーの下まで画面が広がる。横持ちだと左右のノッチが
+   ちょうどメニューに重なるので、その幅だけ中身を内側に寄せる。
+   ふつうにブラウザで開いているときは env(...) が 0 なので何も起きない。 */
+#root {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 button {
   font-family: inherit;
   cursor: pointer;
