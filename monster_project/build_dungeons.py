@@ -107,17 +107,34 @@ BACKGROUNDS = {"grassland", "cave", "ancient_ruins", "lava_cavern", "snow_mounta
 # フロアの絵は3種類しかないので12本のダンジョンで使い回す。
 # 見分けはダンジョンごとの戦闘背景と色味でつける。
 FLOOR_MAPS_DIR = DATA_DIR / "maps"
-FLOOR_MAP_FILES = ["floor_01.json", "floor_02.json", "floor_03.json"]
+
+# biome ごとのフロア図一式。**game/src/field/maps.js の FLOOR_SETS と同じ組**。
+# 草原(dungeon_01〜03)だけ専用の絵があり、残りは洞窟の3枚を色味だけ変えて使う。
+#
+# 組ごとに寸法が違う: 洞窟 20x14マス / 草原 30x20マス。
+# 草原は踏破に必要な歩数が倍近いので、1戦あたりの歩数もそれに合わせて伸ばす
+# (伸ばさないと、同じ設計戦闘数のはずが草原だけ倍近く戦うことになる)。
+FLOOR_MAP_SETS = {
+    "grassland": ["grassland_01.json", "grassland_02.json", "grassland_03.json"],
+    "cave": ["floor_01.json", "floor_02.json", "floor_03.json"],
+}
+DEFAULT_FLOOR_SET = "cave"   # 専用の絵が無い biome はここへ落ちる (maps.js と同じ)
 
 # 実際の歩数は最短経路ちょうどにはならない。曲がり角で行き過ぎたり
 # 宝箱の方へ寄り道したりするぶんの割り増し。
 EXPLORE_FACTOR = 1.35
 
-# 1戦あたりの歩数の許容範囲。
-#   下限 = これより短いと歩くのが苦痛になる
-#   上限 = これより長いと1フロアに1回も戦闘が起きず、雑魚が居ないのと同じ
+# 1戦あたりの歩数の下限。これより短いと歩くのが苦痛になる。
 ENCOUNTER_STEPS_MIN = 10
-ENCOUNTER_STEPS_MAX = 16
+
+# 上限は定数ではなく **そのダンジョンの1フロアの踏破見込み歩数**。
+# これを超えるとフロアを1つ抜けるあいだに1度も戦闘が起きず、雑魚が居ないのと同じ。
+# 固定値(旧 16歩)にしていたときは、広い草原のフロアで上限に張りついてしまい、
+# 「3戦ぶんの強さで設計したのに5戦する」ことになっていた。
+def encounter_steps_max(walk_lengths, floors):
+    """1フロアを抜けるあいだに最低1戦は起きる歩数の上限。"""
+    shortest = min(walk_lengths[f % len(walk_lengths)] for f in range(floors))
+    return max(ENCOUNTER_STEPS_MIN, int(round(shortest * EXPLORE_FACTOR)))
 
 
 def floors_for(spec):
@@ -135,16 +152,17 @@ def floors_for(spec):
     return 3
 
 
-def floor_walk_lengths():
-    """各フロアの「上り階段 -> 下り階段」の最短歩数を、実際のマップから測る。
+def floor_walk_lengths(biome=DEFAULT_FLOOR_SET):
+    """その biome の各フロアの「上り階段 -> 下り階段」の最短歩数を実測する。
 
-    真実はマップ側 (game/src/data/maps/floor_0*.json) にある。ここは読むだけ。
+    真実はマップ側 (game/src/data/maps/*.json) にある。ここは読むだけ。
     通れるマスは walkable_tiles のホワイトリストから collisions を引いたもの。
     """
     from collections import deque
 
+    files = FLOOR_MAP_SETS.get(biome) or FLOOR_MAP_SETS[DEFAULT_FLOOR_SET]
     lengths = []
-    for name in FLOOR_MAP_FILES:
+    for name in files:
         data = json.loads((FLOOR_MAPS_DIR / name).read_text(encoding="utf-8"))
         walk = {tuple(t) for t in data["walkable_tiles"]}
         for c in data.get("collisions", []):
@@ -179,6 +197,11 @@ WILD_TIERS = ("下位", "中位")  # 野生で仲間にできる階級 = カバ�
 MAX_LEVEL = 99
 LEVEL_CURVE_COEF = 6
 LEVEL_CURVE_POWER = 2.0          # expToNextLevel の指数
+# 必要経験値の下駄 (2026-08-31)。曲線は触らず、低レベル側だけを持ち上げる。
+# 6 x Lv^2 だと Lv1->2 が 6 / Lv2->3 が 24 しかなく、はじまりの草原の雑魚1体
+# (42exp) で いきなり Lv3 になっていた。Lv20 では 2400 に対して 30 なので誤差。
+# 詳しい根拠は game/src/engine/growth.js の LEVEL_CURVE_BASE を参照。
+LEVEL_CURVE_BASE = 30
 STAR_EXP_FACTOR = {1: 1.0, 2: 1.35, 3: 1.8, 4: 2.4}
 TIER_EXP_FACTOR = {"下位": 1.0, "中位": 1.6, "上位": 2.4, "最上位": 3.5}
 EXP_LEVEL_POWER = 1.1            # enemyExpValue のレベル指数
@@ -518,7 +541,10 @@ def expected_exp(species, level):
 def exp_to_next(level, star):
     if level >= MAX_LEVEL:
         return float("inf")
-    return round(LEVEL_CURVE_COEF * (level ** LEVEL_CURVE_POWER) * STAR_EXP_FACTOR.get(star, 1.0))
+    return round(
+        (LEVEL_CURVE_COEF * (level ** LEVEL_CURVE_POWER) + LEVEL_CURVE_BASE)
+        * STAR_EXP_FACTOR.get(star, 1.0)
+    )
 
 
 # ==========================================================================
@@ -615,7 +641,8 @@ class Picker:
 def build(monsters, skills_by_id):
     picker = Picker(monsters, skills_by_id)
     out = []
-    walk_lengths = floor_walk_lengths()
+    # biome ごとにフロア図の寸法が違うので、歩数もその組から測る。
+    walk_lengths_by_biome = {b: floor_walk_lengths(b) for b in FLOOR_MAP_SETS}
 
     for i, spec in enumerate(DUNGEONS):
         rec = spec["rec"]
@@ -669,11 +696,16 @@ def build(monsters, skills_by_id):
         # 「1戦あたり何歩か」に翻訳する。踏破に必要な歩数を実測の最短経路から
         # 見積もり、雑魚の戦闘数で割るだけ。
         floors = floors_for(spec)
+        walk_lengths = walk_lengths_by_biome.get(
+            spec["background"], walk_lengths_by_biome[DEFAULT_FLOOR_SET])
         expected_steps = sum(walk_lengths[f % len(walk_lengths)] for f in range(floors))
         expected_steps *= EXPLORE_FACTOR
         mob_fights = max(1, len(spec["encounters"]))
         encounter_steps = int(round(expected_steps / mob_fights))
-        encounter_steps = max(ENCOUNTER_STEPS_MIN, min(ENCOUNTER_STEPS_MAX, encounter_steps))
+        encounter_steps = max(
+            ENCOUNTER_STEPS_MIN,
+            min(encounter_steps_max(walk_lengths, floors), encounter_steps),
+        )
 
         out.append({
             "id": f"dungeon_{i + 1:02d}",
@@ -1022,13 +1054,16 @@ def main():
             errors.append(f"{d['id']} locked の設定が連鎖と合っていない")
 
     # --- 2b. 歩けるダンジョンの整合 ---------------------------------------
-    walk_lengths = floor_walk_lengths()
+    walk_lengths_by_biome = {b: floor_walk_lengths(b) for b in FLOOR_MAP_SETS}
     for d in dungeons:
-        if not (1 <= d["floors"] <= len(FLOOR_MAP_FILES)):
+        walk_lengths = walk_lengths_by_biome.get(
+            d["background"], walk_lengths_by_biome[DEFAULT_FLOOR_SET])
+        if not (1 <= d["floors"] <= len(walk_lengths)):
             errors.append(f"{d['id']} 階層数 {d['floors']} がフロアマップの本数に合わない")
         steps = d["encounterSteps"]
-        if not (ENCOUNTER_STEPS_MIN <= steps <= ENCOUNTER_STEPS_MAX):
-            errors.append(f"{d['id']} エンカウント歩数 {steps} が許容範囲外")
+        steps_max = encounter_steps_max(walk_lengths, d["floors"])
+        if not (ENCOUNTER_STEPS_MIN <= steps <= steps_max):
+            errors.append(f"{d['id']} エンカウント歩数 {steps} が許容範囲({ENCOUNTER_STEPS_MIN}〜{steps_max})外")
         # 1フロアも歩き切らないうちに全部の戦闘が終わる/1戦も起きない、を弾く
         expected = sum(walk_lengths[f % len(walk_lengths)] for f in range(d["floors"]))
         expected *= EXPLORE_FACTOR
@@ -1072,9 +1107,12 @@ def main():
     print()
 
     print("--- 階層とエンカウント率 (歩けるダンジョン) ---")
-    print(f"  フロア最短歩数 (上り階段->下り階段): {walk_lengths} / 探索割増 x{EXPLORE_FACTOR}")
+    for biome, lens in walk_lengths_by_biome.items():
+        print(f"  フロア最短歩数 ({biome:<9} 上り階段->下り階段): {lens} / 探索割増 x{EXPLORE_FACTOR}")
     print("  #  名前            階層 踏破の歩数見込み  1戦あたり歩数  想定戦闘数 -> 見込み")
     for i, d in enumerate(dungeons):
+        walk_lengths = walk_lengths_by_biome.get(
+            d["background"], walk_lengths_by_biome[DEFAULT_FLOOR_SET])
         expected = sum(walk_lengths[f % len(walk_lengths)] for f in range(d["floors"]))
         expected *= EXPLORE_FACTOR
         mob_fights = len(d["encounters"]) - 1

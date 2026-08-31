@@ -52,11 +52,47 @@ from pathlib import Path
 from PIL import Image
 
 SRC = Path(r"C:/Users/pc/Documents/Codex/2026-08-30/do/outputs/dot_rpg_town_assets")
+
+# あとから届いた素材の置き場。素材集(SRC)は読み取り専用の別リポジトリなので、
+# 追加で描いてもらったものはこちらへ入れて、同じように取り込む。
+#   incoming/grassland_and_seisui/    … せいすいのアイコン(フロア図は下で差し替え済み)
+#   incoming/future_assets/           … 戦闘エフェクト8種・ボス部屋5・住人5人・雪の町
+#   incoming/unique_floors_and_props/ … 5地形 x 3階層のフロア図15枚 + 置きもの12種
+INCOMING = Path(__file__).resolve().parent / "incoming"
+GRASSLAND_SRC = INCOMING / "grassland_and_seisui"
+FUTURE_SRC = INCOMING / "future_assets"
+
+# フロア図15枚と置きもの12種。
+#
+# **これは2回目の納品**。1回目(incoming/grassland_and_seisui/ と
+# incoming/remaining_12_floors/)は、15枚のうち約半分で階段の座標が絵と
+# 合っていなかったので取り込まず、置きものだけ使っていた。
+# この修正版は 30ヶ所の階段座標が全部 描かれた階段の上に乗っていて、
+# 上り階段から下り階段へ歩いて行けることを15枚とも確認してある。
+#
+# 草原もこちらに含まれる(1回目の草原3枚は これに置き換わった)。
+# 5地形とも 30x20マス。地形ごとにレイアウトが違う(1回目のように
+# 「草原の使い回しに色を塗っただけ」ではない)。
+FLOORS_SRC = INCOMING / "unique_floors_and_props" / "floors"
+PROPS_SRC = INCOMING / "unique_floors_and_props" / "props"
+
+# 納品の名前 (cave_b1 …) と、game 側で使う名前 (cave_01 …) の対応。
+BIOMES = [
+    ("grassland", "grassland"),
+    ("cave", "cave"),
+    ("ruins", "ruins"),
+    ("snow", "snow"),
+    ("lava", "lava"),
+]
+
 GAME = Path(__file__).resolve().parent.parent / "game"
 OUT_IMG = GAME / "public" / "assets" / "field"
 OUT_DATA = GAME / "src" / "data" / "maps"
 OUT_ITEM_IMG = GAME / "public" / "assets" / "items"
 OUT_UI_IMG = GAME / "public" / "assets" / "ui"
+OUT_FX_IMG = GAME / "public" / "assets" / "effects"
+OUT_AREA_IMG = GAME / "public" / "assets" / "area"
+BATTLE_BG_IMG = GAME / "public" / "assets" / "battle_bg"
 ITEMS_JSON = GAME / "src" / "data" / "items.json"
 
 # GRID_SPEC の「表示領域は最大96x112px」に合わせたコマの大きさ。
@@ -89,6 +125,24 @@ MAP_IMAGES = [
     (SRC / "dungeon/maps/floor_02.png", "floor_02.png"),
     (SRC / "dungeon/maps/floor_03.png", "floor_03.png"),
 ]
+# ダンジョンのフロア図 5地形 x 3階層。どれも 30x20マス (1920x1280px) で、
+# もとからある洞窟の 20x14 より一回り広い。フロア図の寸法は map_tiles から
+# 読むので、ゲーム側は大きさを決め打ちしていない (game/src/field/maps.js)。
+MAP_IMAGES += [
+    (FLOORS_SRC / f"{src}_b{i}.png", f"{out}_{i:02d}.png")
+    for src, out in BIOMES
+    for i in (1, 2, 3)
+]
+
+# ボス部屋5つ。地形ごとに1部屋で、階(floors)とは関係なく「そのダンジョンの
+# ボスと戦う場所」として使う。30x20マスでフロア図と同じ寸法。
+# JSONは stairs が空で、代わりに entrance を1マス持つ。
+BOSS_ROOMS = ["boss_grassland", "boss_cave", "boss_ruins", "boss_snow", "boss_lava"]
+MAP_IMAGES += [(FUTURE_SRC / "boss_rooms" / f"{n}.png", f"{n}.png") for n in BOSS_ROOMS]
+
+# 雪の町。**まだ行き先としては繋いでいない**(2つめの町の中身も、5棟の内装も
+# 無いので、着いても何もできない)。素材と当たり判定だけ先に入れておく。
+MAP_IMAGES += [(FUTURE_SRC / "snow_town" / "snow_town.png", "snow_town.png")]
 
 MAP_LAYOUTS = [
     (SRC / "grid_v2/maps/town_layout_v2.json", "town.json"),
@@ -101,6 +155,13 @@ MAP_LAYOUTS = [
     (SRC / "dungeon/maps/floor_02.json", "floor_02.json"),
     (SRC / "dungeon/maps/floor_03.json", "floor_03.json"),
 ]
+MAP_LAYOUTS += [
+    (FLOORS_SRC / f"{src}_b{i}.json", f"{out}_{i:02d}.json")
+    for src, out in BIOMES
+    for i in (1, 2, 3)
+]
+MAP_LAYOUTS += [(FUTURE_SRC / "boss_rooms" / f"{n}.json", f"{n}.json") for n in BOSS_ROOMS]
+MAP_LAYOUTS += [(FUTURE_SRC / "snow_town" / "snow_town.json", "snow_town.json")]
 
 # 絵から消す矩形と、代わりに貼るきれいな地面の位置 (どちらも px)。
 #
@@ -260,6 +321,142 @@ def build_character(out_name, sheet, row):
     return box, (tw, th)
 
 
+# --- あとから届いた住人5人 -----------------------------------------------
+#
+# 子供3人と老人2人。素材集の12人と違って、**もう 96x112 の8コマに組んだ状態**で
+# 届いている(768x112)。だから build_character のような組み立ては要らない。
+#
+# ただしそのまま使うと2つ困ることがある。
+#
+# 1. 足元が4px 浮いている
+#      12人ぶんの既存シートは足元がコマの下辺(y=112)ちょうどに来ている。
+#      新しい5人は下に4pxの余白があり、そのまま置くと地面から浮いて見える。
+#      **中身を縦にずらすだけ**で直す。
+#
+# 2. 大きさは いじらない
+#      build_character は1人ずつ「コマいっぱい」に引き伸ばす。既存の12人が
+#      全員112px なのはそのためで、子供(townsfolk_3)が大人と同じ背丈になり、
+#      maps.js 側で scale 0.72 をかけて縮め直していた。
+#      新しい5人は **描いた時点で背丈が描き分けてある**
+#      (子供 80px / 老人 98px / 大人 112px)。ここで引き伸ばすと、その
+#      描き分けを一度つぶしてから縮め直すことになり、ドットが二重に
+#      なまるだけで何も良くならない。だから拡大縮小は一切しない。
+RESIDENTS = [
+    "npc_child_boy",
+    "npc_child_girl",
+    "npc_child_explorer",
+    "npc_elderly_man",
+    "npc_elderly_woman",
+]
+
+
+def build_resident(name):
+    """届いた 768x112 の8コマシートを、足元をコマの下辺にそろえて書き出す。"""
+    src = FUTURE_SRC / "residents" / f"{name}.png"
+    im = Image.open(src).convert("RGBA")
+    if im.size != (FRAME_W * 8, FRAME_H):
+        raise SystemExit(
+            f"[ERROR] {name}: シートが {im.size} です "
+            f"({FRAME_W * 8}x{FRAME_H} = 96x112 の8コマを期待)"
+        )
+
+    frames = [im.crop((i * FRAME_W, 0, (i + 1) * FRAME_W, FRAME_H)) for i in range(8)]
+
+    # 8コマぶんの外接矩形の**和**。コマごとに切ると歩行の左右でズレて見える。
+    box = None
+    for f in frames:
+        b = f.getbbox()
+        if b is None:
+            continue
+        box = b if box is None else (
+            min(box[0], b[0]), min(box[1], b[1]), max(box[2], b[2]), max(box[3], b[3])
+        )
+    if box is None:
+        raise SystemExit(f"[ERROR] {name}: 中身が空のシートです")
+
+    # 下へどれだけずらせば足元がコマの下辺に来るか。拡大縮小はしない。
+    shift = FRAME_H - box[3]
+    out_img = Image.new("RGBA", (FRAME_W * 8, FRAME_H), (0, 0, 0, 0))
+    for i, f in enumerate(frames):
+        out_img.paste(f, (i * FRAME_W, shift), f)
+
+    out = OUT_IMG / "chars" / f"{name}.png"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out_img.save(out, optimize=True)
+    height = box[3] - box[1]
+    print(
+        f"char  {name:26} bbox={box} 背丈 {height}px "
+        f"(コマ高 {FRAME_H}px の {height / FRAME_H:.0%}) 足元を {shift}px 下げた"
+    )
+
+
+def build_residents():
+    for name in RESIDENTS:
+        build_resident(name)
+
+
+# --- 戦闘エフェクト ------------------------------------------------------
+#
+# 1枚 = 1152x192 = 192x192 の6コマ。加工は要らないので、寸法だけ検証して
+# そのまま public/assets/effects/ へ写す。ここで検証しておかないと、
+# コマ数の違う絵が届いたときに「戦闘中だけ絵がずれる」という
+# いちばん気づきにくい壊れ方をする。
+EFFECTS = [
+    "fx_zangeki", "fx_dageki", "fx_honoo", "fx_koori",
+    "fx_kaminari", "fx_kaifuku", "fx_doku", "fx_kyouka",
+]
+FX_FRAME_PX = 192
+FX_FRAMES = 6
+
+
+def build_effects():
+    OUT_FX_IMG.mkdir(parents=True, exist_ok=True)
+    for name in EFFECTS:
+        src = FUTURE_SRC / "effects" / f"{name}.png"
+        im = Image.open(src)
+        if im.size != (FX_FRAME_PX * FX_FRAMES, FX_FRAME_PX):
+            raise SystemExit(
+                f"[ERROR] {name}: {im.size} です "
+                f"({FX_FRAME_PX * FX_FRAMES}x{FX_FRAME_PX} = 192pxの6コマを期待)。"
+                f" game/src/engine/battle/effects.js の FX_FRAME と合わせてください。"
+            )
+        if im.mode != "RGBA":
+            raise SystemExit(f"[ERROR] {name}: 透過(RGBA)ではありません ({im.mode})")
+        shutil.copyfile(src, OUT_FX_IMG / f"{name}.png")
+        print(f"fx    {name:26} {im.size} = {FX_FRAME_PX}px x {FX_FRAMES}コマ")
+
+
+# --- ダンジョンに散らす置きもの ------------------------------------------
+#
+# 12種。素材は 256x256 の透過PNGで下中央そろえ。宝箱とまったく同じ扱いで、
+# 外接矩形で切ってから 1マス(64px)に収まる大きさへ落とす。
+# **切ってから長辺で合わせる**ので、背の高い石柱も横長のトロッコも
+# マスからはみ出さない。
+PROPS = [
+    "prop_tsubo", "prop_hone", "prop_taru", "prop_hako", "prop_taimatsu",
+    "prop_torokko", "prop_tsuruhashi", "prop_sekichu", "prop_sekizou",
+    "prop_tsurara", "prop_yukidaruma", "prop_toke_iwa",
+]
+PROP_PX = 58  # 1マス64pxの中に置く。宝箱(60px)より気持ち小さく = 主役は宝箱
+
+
+def build_props():
+    out_dir = OUT_IMG / "objects"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for name in PROPS:
+        src = PROPS_SRC / f"{name}.png"
+        im = Image.open(src).convert("RGBA")
+        box = im.getbbox()
+        if box is None:
+            raise SystemExit(f"[ERROR] {name}: 中身が空です")
+        cropped = im.crop(box)
+        cw, ch = cropped.size
+        scale = PROP_PX / max(cw, ch)
+        tw, th = max(1, round(cw * scale)), max(1, round(ch * scale))
+        cropped.resize((tw, th), Image.LANCZOS).save(out_dir / f"{name}.png", optimize=True)
+        print(f"prop  {name:26} bbox={box} -> {tw}x{th}")
+
+
 # --- 焼き込みの階段を消す ------------------------------------------------
 #
 # 階段は 2x2マス(128x128px)ぶん描き込まれていて、左上のマスが
@@ -318,6 +515,169 @@ def erase_baked_figures():
         erase_baked_stairs(name, im, src_im)
         repair_assets(name, im)
         im.save(path)
+
+
+# --- 溶岩のマスを通れなくする --------------------------------------------
+#
+# 残り4地形は「草原と同じレイアウトに、絵だけ塗り替えた」もの
+# (納品の README がそう明言している)。草原には歩ける床が2種類あった:
+#   ・うす茶色の道
+#   ・草地のパッチ
+# 溶岩地形ではこの **草地のパッチが溶岩の池に塗り替えられた**。ところが
+# walkable_tiles は草原のままなので、そのまま出すと主人公が煮えたぎる溶岩の上を
+# 平気で歩く。ここでレイアウトJSONを作り直して、溶岩のマスを壁にする。
+#
+# 納品JSONは書きかえない。**書き出したあとの game/src/data/maps/lava_0N.json を
+# 絵から導出して上書きする**。だからパイプラインを回し直せば同じ結果になるし、
+# 溶岩地形が描き直されて届いても、同じ処理がそのままかかる。
+#
+# 判定は「マスの過半が溶けた岩の色か」。1点(マスの中心)だけを見る判定も試したが、
+# 溶岩には暗い黒ずんだ地殻の模様があって、池のまん中のマスでも中心画素が
+# そこに当たると「岩」と誤判定する(実際に池の中に歩けるマスが虫食い状に残った)。
+# マス全体の割合で見れば、池のまん中は必ず過半が溶岩になる。
+LAVA_LAYOUTS = ["lava_01", "lava_02", "lava_03"]
+
+# 溶岩マスと判定する割合。0.5 = マスの過半。
+# これ未満のマス(池のふち)は歩けるまま = 「岸」として残る。
+LAVA_MIN_FRACTION = 0.5
+LAVA_PIXEL_STEP = 2  # 画素の間引き。64px のマスを 32x32 点で見る
+
+# レイアウトJSONに足す当たり判定の名前。
+# field/maps.js の PROP_LINES がこの名前で「溶岩だ、渡れない」を返す。
+# ただの壁にすると、溶岩を調べたときに **何も起きない** = 壊れて見える。
+LAVA_COLLISION_NAME = "lava_lake"
+
+# 到達性のために歩けるまま残してよい溶岩マスの上限。
+#
+# 溶岩は絵で描かれていて 64px の格子には乗っていない。b2 と b3 では
+# 溶岩の流れが通路をまたいでいて、溶岩マスを全部ふさぐと下り階段へ行けなくなる
+# (実測: b2 は1マス、b3 は1マスだけがそういう「渡らないと先へ進めない」マス)。
+# そこだけは「溶岩ぎわの足場」として残し、警告に出す。
+# ここを超えたら絵とレイアウトが根本的に食い違っているので、黙って
+# 通れないフロアを出荷せずに失敗させる。
+LAVA_BRIDGE_MAX = 2
+LAVA_BRIDGE_MAX_FRACTION = 0.8  # 足場として残してよい溶岩の濃さの上限
+
+
+def _is_molten(rgb):
+    """その画素が「溶けた岩」の色か。岩は無彩色、溶岩は赤〜橙で彩度が高い。"""
+    r, g, b = rgb
+    mx = max(r, g, b)
+    if mx < 60:
+        return False          # 暗すぎる = 影か黒い岩
+    if r != mx or g < b:
+        return False          # 赤が最大でなければ溶岩ではない(青白い氷などを弾く)
+    return (mx - min(r, g, b)) / mx > 0.55
+
+
+def _molten_fraction(px, x, y, tile):
+    hit = total = 0
+    for yy in range(y * tile, (y + 1) * tile, LAVA_PIXEL_STEP):
+        for xx in range(x * tile, (x + 1) * tile, LAVA_PIXEL_STEP):
+            total += 1
+            if _is_molten(px[xx, yy]):
+                hit += 1
+    return hit / total
+
+
+def _reachable(walkable, start):
+    """walkable(マスの集合) の上を start から歩いて行ける範囲。"""
+    seen = {start}
+    stack = [start]
+    while stack:
+        cx, cy = stack.pop()
+        for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+            n = (cx + dx, cy + dy)
+            if n in seen or n not in walkable:
+                continue
+            seen.add(n)
+            stack.append(n)
+    return seen
+
+
+def derive_lava_blocks():
+    """溶岩に塗られたマスを walkable_tiles から外し、当たり判定に変える。"""
+    for name in LAVA_LAYOUTS:
+        layout_path = OUT_DATA / f"{name}.json"
+        image_path = OUT_IMG / f"{name}.png"
+        if not layout_path.exists() or not image_path.exists():
+            raise SystemExit(f"[ERROR] {name}: レイアウトか絵が先に出力されていません")
+
+        data = json.loads(layout_path.read_text(encoding="utf-8"))
+        tile = data.get("tile_px", 64)
+        im = Image.open(image_path).convert("RGB")
+        px = im.load()
+        cols, rows = data["map_tiles"]
+        if im.size != (cols * tile, rows * tile):
+            raise SystemExit(
+                f"[ERROR] {name}: 絵 {im.size} と map_tiles {data['map_tiles']} x {tile}px が合いません"
+            )
+
+        walk = [tuple(t) for t in data["walkable_tiles"]]
+        up = tuple(data["stairs"]["up"])
+        down = tuple(data["stairs"]["down"])
+
+        frac = {t: _molten_fraction(px, t[0], t[1], tile) for t in walk}
+        # 階段のマスは絶対にふさがない。ふさぐとフロアに入った瞬間に詰む。
+        for t in (up, down):
+            if frac.get(t, 0) > LAVA_MIN_FRACTION:
+                raise SystemExit(
+                    f"[ERROR] {name}: 階段のマス {t} が溶岩に塗られています "
+                    f"(溶岩率 {frac[t]:.0%})。絵かレイアウトのどちらかが間違っています。"
+                )
+        lava = {t for t in walk if frac[t] > LAVA_MIN_FRACTION} - {up, down}
+
+        # 階段どうしが行き来できるか。できないなら、いちばん薄い溶岩マスから
+        # 順に足場として開け直す。
+        bridges = []
+        while True:
+            open_tiles = set(walk) - lava
+            if down in _reachable(open_tiles, up):
+                break
+            if len(bridges) >= LAVA_BRIDGE_MAX:
+                raise SystemExit(
+                    f"[ERROR] {name}: 溶岩をふさぐと下り階段 {down} へ行けません。"
+                    f" 足場を {LAVA_BRIDGE_MAX} マス開けても つながりませんでした。"
+                    f" 絵とレイアウトが食い違っています(この地形は出荷できません)。"
+                )
+            here = _reachable(open_tiles, up)
+            # 開け直す1マスを選ぶ。到達範囲がいちばん広がるものを取り、
+            # 同点なら溶岩が薄いほう。毎回同じ答えになるよう最後は座標で決める。
+            best = None
+            for t in sorted(lava, key=lambda t: (frac[t], t)):
+                gain = len(_reachable(open_tiles | {t}, up)) - len(here)
+                if best is None or gain > best[0]:
+                    best = (gain, t)
+            spot = best[1]
+            if frac[spot] > LAVA_BRIDGE_MAX_FRACTION:
+                raise SystemExit(
+                    f"[ERROR] {name}: 足場に開け直すしかないマス {spot} が"
+                    f" 溶岩率 {frac[spot]:.0%} です(上限 {LAVA_BRIDGE_MAX_FRACTION:.0%})。"
+                    f" 通路がまるごと溶岩の下です。"
+                )
+            lava.discard(spot)
+            bridges.append((spot, frac[spot]))
+
+        kept = [t for t in walk if t not in lava]
+        data["walkable_tiles"] = [list(t) for t in kept]
+        data["collisions"] = list(data.get("collisions", [])) + [
+            {"name": LAVA_COLLISION_NAME, "rect_tiles": [t[0], t[1], 1, 1]}
+            for t in sorted(lava)
+        ]
+        layout_path.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+
+        reach = len(_reachable(set(kept) | {up, down}, up))
+        print(
+            f"lava  {name:26} 溶岩 {len(lava)} マスを通行止め "
+            f"({len(walk)} -> {len(kept)} マス / 階段から {reach} マス到達)"
+        )
+        for spot, f in bridges:
+            print(
+                f"      [WARN] {name}: マス{spot} は溶岩 {f:.0%} だが、ここを塞ぐと"
+                f" 下り階段へ行けなくなるため 足場として残した"
+            )
 
 
 # --- ダンジョンに置く宝箱 -------------------------------------------------
@@ -389,6 +749,11 @@ def build_stairs():
 # (実際に見比べて NEAREST を選んだ)。
 ITEM_ICON_SRC = SRC / "item_icons_216" / "png"
 
+# 素材集の外から来たアイコン。せいすい は最初の25枚を発注したあとに
+# 足したどうぐで、あとから単体で描いてもらった (216x216 で寸法は同じ)。
+# 素材集そのものには書き込めないので、置き場だけ別にして扱いは同じにする。
+ITEM_ICON_EXTRA = [GRASSLAND_SRC / "26_seisui.png"]
+
 # 出力の大きさ。使う所はどれも小さい:
 #   ダンジョンの床  … 1マス64pxの中に置く
 #   ふくろ          … 一覧のタイル
@@ -422,6 +787,10 @@ def build_item_icons():
     pngs = sorted(ITEM_ICON_SRC.glob("*.png"))
     if not pngs:
         raise SystemExit(f"[ERROR] どうぐアイコンが見つかりません: {ITEM_ICON_SRC}")
+    for extra in ITEM_ICON_EXTRA:
+        if not extra.exists():
+            raise SystemExit(f"[ERROR] 追加のどうぐアイコンが見つかりません: {extra}")
+        pngs.append(extra)
 
     matched = 0
     for path in pngs:
@@ -441,6 +810,8 @@ def build_item_icons():
         print(f"item  {item_id:26} <- {path.name}  {im.size} -> {ITEM_ICON_PX}px")
 
     # 絵の無いどうぐ。null のままにして「絵が来ていない」ことを明示する。
+    # (2026-08-31 の せいすい 到着で 26/26 そろったが、今後どうぐを足したときに
+    #  また出る。UI側 (components/Common/ItemIcon.jsx) の代わりの見た目は残す。)
     missing = [it["name"] for it in items if not it.get("icon")]
     for it in items:
         if not it.get("icon"):
@@ -475,6 +846,95 @@ def build_gold_icon():
     print(f"ui    gold.png                   <- {sheet}/{cell}  bbox={box} -> {tw}x{th}")
 
 
+def build_title():
+    """表紙の絵。
+
+    incoming/title/ に2案 届いている。
+
+      title_wide_1920.png    … 上半分が空。**表紙に使うのはこちら**。
+                               題と「はじめから／つづきから」を空に置けば、
+                               モンスターにも地面にも一切かからない。
+      title_closeup_1920.png … 寄りの構図。上まで山と人物で埋まっていて
+                               題を置く場所が無い。README や紹介画像のために
+                               リポジトリへは残してあるが、ゲームには入れない。
+
+    ドット絵の質感を残したいので、縮小も加工もせずそのまま写す
+    (1920x1080。表紙は1枚しか読まないので大きさは許容範囲)。
+    """
+    src = INCOMING / "title" / "title_wide_1920.png"
+    if not src.exists():
+        raise SystemExit(f"[ERROR] 表紙の絵がありません: {src}")
+    OUT_UI_IMG.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(src, OUT_UI_IMG / "title.png")
+    with Image.open(src) as im:
+        w, h = im.size
+    print(f"ui    title.png                  <- {src.name}  {w}x{h}")
+
+
+
+# --- エリアマップの丸アイコン -------------------------------------------
+#
+# ダンジョン選択が「12枚のカード一覧」から「5つのエリアを横に辿る地図」に
+# なった。地図に置くのは丸いアイコン1個ずつ。
+#
+# 新しく絵を描き起こすのではなく、**戦闘背景をそのまま丸く抜く**。
+# 同じ絵が戦闘でも出るので、地図のアイコンと実際に立つ場所が一致する。
+#
+# 切り出す枠は地形ごとに手で決めてある(下の AREA_CROPS)。背景は
+# 1024x768 の横長で、真ん中は「モンスターが立つための空き地」として
+# わざと平らに描かれている。中央をそのまま抜くと、どの地形も
+# 「のっぺりした床」にしか見えない。地形が一目で分かる特徴
+# (草原の木、洞窟の水晶、神殿の扉、雪山の峰、火口の溶岩)が
+# 入る位置を選んである。
+#
+#   値は元画像(1024x768)の (left, top, size) で、正方形を切る。
+AREA_CROPS = {
+    # 左端の大木と、その下の草地。空・山・草の三層が入る。
+    "grassland": (0, 40, 480),
+    # 天井から下がる鍾乳石と、床ぎわの青い水晶。中央の平らな土は避ける。
+    "cave": (60, 0, 400),
+    # 正面の飾り扉と両脇の柱。神殿だと分かるのはここだけ。
+    "ancient_ruins": (270, 20, 480),
+    # 尖った峰と、その手前の雪原。左端の針葉樹も少し入れる。
+    "snow_mountain": (100, 140, 480),
+    # 右手の溶岩の滝と、手前の割れた床を流れる赤い筋。
+    "lava_cavern": (300, 60, 400),
+}
+
+# 書き出す大きさ。地図では 60〜110px で出すので、2倍見当あれば足りる。
+AREA_ICON_PX = 192
+
+# 縁のなめらかさ。この倍率でマスクを描いてから縮めることで、
+# 丸のふちのギザギザを消す(ドット絵のままでは丸が階段になる)。
+AREA_MASK_SS = 4
+
+
+def build_area_icons():
+    """戦闘背景を丸く抜いて、エリア地図のアイコンにする。"""
+    from PIL import ImageDraw
+
+    OUT_AREA_IMG.mkdir(parents=True, exist_ok=True)
+    px = AREA_ICON_PX
+    mask = Image.new("L", (px * AREA_MASK_SS, px * AREA_MASK_SS), 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, mask.size[0] - 1, mask.size[1] - 1), fill=255)
+    mask = mask.resize((px, px), Image.LANCZOS)
+
+    for name, (left, top, size) in AREA_CROPS.items():
+        src = BATTLE_BG_IMG / f"{name}.png"
+        if not src.exists():
+            raise SystemExit(f"[ERROR] 戦闘背景がありません: {src}")
+        im = Image.open(src).convert("RGB")
+        w, h = im.size
+        if left + size > w or top + size > h:
+            raise SystemExit(f"[ERROR] {name}: 切り出し枠が絵({w}x{h})からはみ出している")
+        crop = im.crop((left, top, left + size, top + size)).resize((px, px), Image.LANCZOS)
+        out = Image.new("RGBA", (px, px), (0, 0, 0, 0))
+        out.paste(crop, (0, 0))
+        out.putalpha(mask)
+        out.save(OUT_AREA_IMG / f"{name}.png", optimize=True)
+        print(f"area  {name + '.png':26} <- battle_bg  crop=({left},{top},{size}) -> {px}x{px}")
+
+
 def main():
     OUT_IMG.mkdir(parents=True, exist_ok=True)
     OUT_DATA.mkdir(parents=True, exist_ok=True)
@@ -499,12 +959,22 @@ def main():
         box, size = build_character(out_name, sheet, row)
         print(f"char  {out_name:26} row{row} of {sheet}  bbox={box} -> {size}")
 
+    build_residents()
     build_chests()
     build_stairs()
+    build_props()
+    build_effects()
     erase_baked_figures()
+    # 絵からの導出。納品JSONではなく、書き出したあとのレイアウトを作り直す。
+    derive_lava_blocks()
     build_item_icons()
     build_gold_icon()
-    print(f"\n出力: {OUT_IMG}  /  {OUT_DATA}  /  {OUT_ITEM_IMG}  /  {OUT_UI_IMG}")
+    build_title()
+    build_area_icons()
+    print(
+        f"\n出力: {OUT_IMG}  /  {OUT_DATA}  /  {OUT_ITEM_IMG}  /  {OUT_UI_IMG}"
+        f"  /  {OUT_FX_IMG}"
+    )
 
 
 if __name__ == "__main__":

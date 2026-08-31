@@ -8,7 +8,7 @@
     "partySizeHint": 1,
     "locked": false,
     "floors": 1,
-    "encounterSteps": 13,
+    "encounterSteps": 19,
     "encounters": [
       {
         "id": "encounter_1",
@@ -98,7 +98,7 @@
     "partySizeHint": 2,
     "locked": true,
     "floors": 1,
-    "encounterSteps": 13,
+    "encounterSteps": 19,
     "encounters": [
       {
         "id": "encounter_1",
@@ -196,7 +196,7 @@
     "partySizeHint": 2,
     "locked": true,
     "floors": 2,
-    "encounterSteps": 16,
+    "encounterSteps": 27,
     "encounters": [
       {
         "id": "encounter_1",

@@ -19,7 +19,9 @@
 // 両方。スマホは画面を指でふさぐので、どちらか一方では足りない。
 
 import Phaser from 'phaser';
-import { TILE, CHAR_FRAME, CHAR_SHEETS, DIR_FRAME, OBJECT_IMAGES } from '../field/maps.js';
+import {
+  TILE, CHAR_FRAME, CHAR_SHEETS, DIR_FRAME, OBJECT_IMAGES, BOSS_TRIGGER_RANGE,
+} from '../field/maps.js';
 
 /** 1マス歩くのにかける時間(ms)。短すぎると操作が滑る、長いともっさりする。 */
 const STEP_MS = 135;
@@ -53,6 +55,10 @@ const DIR_NAMES = ['up', 'down', 'left', 'right'];
 // --- 町をうろつく住人のツマミ ---------------------------------------------
 // 「にぎわい」であって「交通」ではないので、主人公よりずっと遅く、
 // 1〜2マス歩いては立ち止まる。値をいじるならここだけ。
+//
+// 1人ずつ上書きもできる (maps.js の wanderers[] に stepMs / pauseMin / pauseMax)。
+// 子供は速く、老人はゆっくり。同じ速さで歩かせると、背丈が違うだけの
+// 同じ人になってしまう。
 const WANDER = {
   stepMs: 320,        // 1マスにかける時間(主人公の135msより かなり遅い)
   pauseMin: 500,      // 立ち止まる時間の下限
@@ -115,6 +121,15 @@ export class MapScene extends Phaser.Scene {
         if (!this.textures.exists(url)) this.load.image(url, url);
       });
     }
+    // 散らしてある置きもの(樽・石像など)とボスの絵。同じ種類が何個あっても
+    // テクスチャは1枚で足りる。読めなくても「絵が出ないだけ」で歩ける。
+    new Set(
+      (map.objects || [])
+        .filter((o) => (o.kind === 'prop' || o.kind === 'boss') && o.imageUrl)
+        .map((o) => o.imageUrl),
+    ).forEach((url) => {
+      if (!this.textures.exists(url)) this.load.image(url, url);
+    });
     // 床に落ちているどうぐの絵 (items.json の icon)。同じ種類が何個落ちていても
     // テクスチャは1枚で足りる。
     new Set(
@@ -397,6 +412,19 @@ export class MapScene extends Phaser.Scene {
             }
             : null,
         });
+        // ボス部屋。奥まで踏み込んだら、ぶつかる前に立ちはだかられる。
+        // 「ボスのマスを調べる」だけにすると、部屋の主の前を素通りできて
+        // しまい、出口の無い部屋に閉じこめられただけになる。
+        if (this.map.bossTile) {
+          const [bx, by] = this.map.bossTile;
+          const near = Math.max(Math.abs(nx - bx), Math.abs(ny - by)) <= BOSS_TRIGGER_RANGE;
+          if (near) {
+            this.onEvent('trigger', {
+              trigger: { type: 'bossFight' }, tile: { x: nx, y: ny }, facing: this.facing,
+            });
+            return;
+          }
+        }
         const trigger = this.map.triggerAt(nx, ny);
         if (trigger) {
           this.onEvent('trigger', { trigger, tile: { x: nx, y: ny }, facing: this.facing });
@@ -432,6 +460,31 @@ export class MapScene extends Phaser.Scene {
         this.add.image(cx, cy, url)
           .setOrigin(0.5, 0.5)
           .setDepth(obj.tile[1] * TILE + TILE - 1);
+        return;
+      }
+      if (obj.kind === 'prop') {
+        // 宝箱とまったく同じ置き方(足元そろえ + うっすら影)。
+        // マスは通れないので、四方どちらからでも「しらべる」が届く。
+        if (!obj.imageUrl || !this.textures.exists(obj.imageUrl)) return;
+        const { x, y } = this.tileToFoot(obj.tile[0], obj.tile[1]);
+        this.add.ellipse(x, y - 5, TILE * 0.55, TILE * 0.18, 0x000000, 0.28).setDepth(y - 2);
+        this.add.image(x, y - 3, obj.imageUrl).setOrigin(0.5, 1).setDepth(y - 1);
+        return;
+      }
+      if (obj.kind === 'boss') {
+        // ボス部屋の主。1マスに収めると小物と同じ大きさになってしまうので、
+        // 2マスぶんの高さで置いて「大きい」ことを見せる。
+        if (!obj.imageUrl || !this.textures.exists(obj.imageUrl)) return;
+        const { x, y } = this.tileToFoot(obj.tile[0], obj.tile[1]);
+        this.add.ellipse(x, y - 6, TILE * 1.1, TILE * 0.34, 0x000000, 0.35).setDepth(y - 2);
+        const img = this.add.image(x, y, obj.imageUrl).setOrigin(0.5, 1).setDepth(y - 1);
+        const h = TILE * 2;
+        const aspect = img.width > 0 ? img.width / img.height : 1;
+        img.setDisplaySize(h * aspect, h);
+        // ゆっくり上下させて「生きている」ことを見せる。
+        this.tweens.add({
+          targets: img, y: y - 6, duration: 1400, ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
+        });
         return;
       }
       if (obj.kind === 'chest') {
@@ -506,16 +559,32 @@ export class MapScene extends Phaser.Scene {
     this.wanderOccupied = new Set();
     (this.map.wanderers || []).forEach((def) => {
       const [tx, ty] = def.tile;
-      if (this.map.isBlocked(tx, ty)) return;
+      if (this.map.isBlocked(tx, ty)) {
+        // 持ち場が壁の中。**黙って消える**のがいちばん困る(住人を1人足したのに
+        // 町のどこを探しても居ない、という形で出てくる)。開発中は声を上げる。
+        if (import.meta.env.DEV) {
+          console.warn(
+            `[MapScene] 住人 ${def.sheet} の持ち場 (${tx},${ty}) は通れないマスです。`
+            + ' この住人は出てきません (field/maps.js の wanderers を直してください)',
+          );
+        }
+        return;
+      }
       const { x, y } = this.tileToFoot(tx, ty);
-      // 素材はどの人物も112pxへ正規化されているので、子供もそのままだと
-      // 大人と同じ背丈になってしまう。def.scale で縮めて背格好を作る。
+      // 最初の12人は素材を1人ずつコマいっぱい(112px)へ引き伸ばして作ったので、
+      // 子供もそのままだと大人と同じ背丈になる。def.scale で縮めて背格好を作る。
+      // あとから届いた5人は素材の時点で背丈が描き分けてある(子供80px /
+      // 老人98px / 大人112px)ので scale は付けない。maps.js の
+      // RESIDENT_SHEETS のコメントを参照。
       const scale = def.scale ?? 1;
       const shadow = this.add.ellipse(x, y - 3, TILE * 0.5 * scale, TILE * 0.2 * scale, 0x000000, 0.26);
       const facing = DIR_NAMES[Math.floor(Math.random() * 4)];
       const sprite = this.add.sprite(x, y, CHAR_SHEETS[def.sheet], DIR_FRAME[facing]);
       sprite.setOrigin(0.5, 1);
       sprite.setScale(scale);
+      // 1人ずつの歩き方。書いていなければ WANDER の共通値を使う。
+      const pauseMin = def.pauseMin ?? WANDER.pauseMin;
+      const pauseMax = def.pauseMax ?? WANDER.pauseMax;
       const w = {
         sprite,
         shadow,
@@ -523,12 +592,15 @@ export class MapScene extends Phaser.Scene {
         ty,
         home: [tx, ty],
         radius: def.radius ?? 2,
+        stepMs: def.stepMs ?? WANDER.stepMs,
+        pauseMin,
+        pauseMax,
         facing,
         parity: 0,
         moving: false,
         stepsLeft: 0,
         // 初期の待ち時間をばらけさせる。そろって動き出すと機械に見える。
-        wait: WANDER.pauseMin + Math.random() * WANDER.pauseMax,
+        wait: pauseMin + Math.random() * pauseMax,
       };
       this.setWandererFrame(w);
       this.updateWandererDepth(w);
@@ -576,7 +648,7 @@ export class MapScene extends Phaser.Scene {
         if (Math.random() < WANDER.turnChance) {
           w.facing = DIR_NAMES[Math.floor(Math.random() * 4)];
           this.setWandererFrame(w);
-          w.wait = WANDER.pauseMin + Math.random() * WANDER.pauseMax;
+          w.wait = w.pauseMin + Math.random() * w.pauseMax;
           continue;
         }
         // 4方向をシャッフルして、行けるほうを1つ選ぶ。まったくの
@@ -591,7 +663,7 @@ export class MapScene extends Phaser.Scene {
           return this.canWanderTo(w, w.tx + ddx, w.ty + ddy);
         });
         if (!pick) {
-          w.wait = WANDER.pauseMin + Math.random() * WANDER.pauseMax;
+          w.wait = w.pauseMin + Math.random() * w.pauseMax;
           continue;
         }
         w.facing = pick;
@@ -605,7 +677,7 @@ export class MapScene extends Phaser.Scene {
       if (!this.canWanderTo(w, nx, ny)) {
         // 行き止まり。向き直して、ひと呼吸おく。
         w.stepsLeft = 0;
-        w.wait = WANDER.pauseMin + Math.random() * WANDER.pauseMax;
+        w.wait = w.pauseMin + Math.random() * w.pauseMax;
         continue;
       }
       this.stepWanderer(w, nx, ny);
@@ -624,7 +696,7 @@ export class MapScene extends Phaser.Scene {
       targets: [w.sprite, w.shadow],
       x: dest.x,
       y: (target) => (target === w.shadow ? dest.y - 3 : dest.y),
-      duration: WANDER.stepMs,
+      duration: w.stepMs,
       ease: 'Linear',
       onUpdate: () => this.updateWandererDepth(w),
       onComplete: () => {
@@ -633,7 +705,7 @@ export class MapScene extends Phaser.Scene {
         w.moving = false;
         this.updateWandererDepth(w);
         if (w.stepsLeft <= 0) {
-          w.wait = WANDER.pauseMin + Math.random() * WANDER.pauseMax;
+          w.wait = w.pauseMin + Math.random() * w.pauseMax;
           this.setWandererFrame(w);
         }
       },
